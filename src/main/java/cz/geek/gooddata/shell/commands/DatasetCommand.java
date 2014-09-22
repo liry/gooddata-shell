@@ -1,6 +1,7 @@
 package cz.geek.gooddata.shell.commands;
 
 import com.gooddata.dataset.Dataset;
+import cz.geek.gooddata.shell.components.GoodDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -45,7 +46,7 @@ public class DatasetCommand extends GoodDataCommand {
         final Collection<Dataset> datasets = holder.getGoodData().getDatasetService().listDatasets(holder.getCurrentProject());
         final List<String> result = new ArrayList<String>();
         for (Dataset dataset: datasets) {
-            result.add(dataset.getIdentifier() + " " + dataset.getTitle());
+            result.add(dataset.getLink() + " " + dataset.getIdentifier() + " " + dataset.getTitle());
         }
         return StringUtils.collectionToDelimitedString(result, "\n");
     }

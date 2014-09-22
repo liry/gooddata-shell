@@ -1,7 +1,8 @@
 package cz.geek.gooddata.shell.commands;
 
-import com.gooddata.GoodDataException;
+import com.gooddata.account.Account;
 import com.gooddata.project.Project;
+import cz.geek.gooddata.shell.components.GoodDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
@@ -25,15 +26,11 @@ public class LoginCommand extends GoodDataCommand {
             @CliOption(key = {"project"}, mandatory = false, help = "Current project") String projectId) {
 
         holder.login(host, user, pass);
-        try {
-            final String current = holder.getGoodData().getAccountService().getCurrent().getId();
-            if (projectId != null) {
-                final Project project = holder.getGoodData().getProjectService().getProjectById(projectId);
-                holder.setCurrentProject(project);
-            }
-            return "Logged " + current;
-        } catch (GoodDataException e) {
-            return "Unable to log in: " + e.getMessage();
+        final Account current = holder.getGoodData().getAccountService().getCurrent();
+        if (projectId != null) {
+            final Project project = holder.getGoodData().getProjectService().getProjectById(projectId);
+            holder.setCurrentProject(project);
         }
+        return "Logged: " + current.getSelfLink() + " " + current.getFirstName() + " " + current.getLastName();
     }
 }

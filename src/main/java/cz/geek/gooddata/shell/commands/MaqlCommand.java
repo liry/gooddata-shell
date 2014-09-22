@@ -1,5 +1,6 @@
 package cz.geek.gooddata.shell.commands;
 
+import cz.geek.gooddata.shell.components.GoodDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;

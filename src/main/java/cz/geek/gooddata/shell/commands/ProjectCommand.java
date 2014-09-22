@@ -1,6 +1,8 @@
 package cz.geek.gooddata.shell.commands;
 
 import com.gooddata.project.Project;
+import com.gooddata.project.ProjectService;
+import cz.geek.gooddata.shell.components.GoodDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -15,7 +17,7 @@ public class ProjectCommand extends GoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"project list", "project create", "project id"})
+    @CliAvailabilityIndicator({"project list", "project create", "project use"})
     public boolean isAvailable() {
         return holder.hasGoodData();
     }
@@ -24,7 +26,7 @@ public class ProjectCommand extends GoodDataCommand {
     public String list() {
         final StringBuilder builder = new StringBuilder();
         for (Project project: holder.getGoodData().getProjectService().getProjects()) {
-            builder.append(project.getId()).append(' ').append(project.getTitle()).append('\n');
+            builder.append(project.getSelfLink()).append(' ').append(project.getTitle()).append('\n');
         }
         return builder.toString();
     }
@@ -39,17 +41,19 @@ public class ProjectCommand extends GoodDataCommand {
         p.setProjectTemplate(template);
         final Project project = holder.getGoodData().getProjectService().createProject(p).get();
         holder.setCurrentProject(project);
-        return "project: " + project.getId();
+        return "Created project: " + project.getSelfLink();
     }
 
-    @CliCommand(value = "project id", help = "Get or set current GoodData project")
-    public String project(@CliOption(key = {""}, mandatory = false, help = "Project id") String projectId) {
+    @CliCommand(value = "project use", help = "Get or set current GoodData project")
+    public String project(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String projectId) {
         if (projectId !=  null) {
-            final Project project = holder.getGoodData().getProjectService().getProjectById(projectId);
+
+            final ProjectService service = holder.getGoodData().getProjectService();
+            final Project project = Project.TEMPLATE.matches(projectId) ? service.getProjectByUri(projectId) : service.getProjectById(projectId);
             holder.setCurrentProject(project);
         }
         if (holder.hasCurrentProject()) {
-            return "Current project: " + holder.getCurrentProject().getId();
+            return "Current project: " + holder.getCurrentProject().getSelfLink();
         } else {
             return "No current project";
         }

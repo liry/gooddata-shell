@@ -1,4 +1,4 @@
-package cz.geek.gooddata.shell.commands;
+package cz.geek.gooddata.shell.components;
 
 import com.gooddata.GoodData;
 import com.gooddata.project.Project;

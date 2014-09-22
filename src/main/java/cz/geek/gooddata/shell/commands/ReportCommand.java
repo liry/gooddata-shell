@@ -6,6 +6,7 @@ import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
 import cz.geek.gooddata.shell.Utils;
+import cz.geek.gooddata.shell.components.GoodDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -33,10 +34,10 @@ public class ReportCommand extends GoodDataCommand {
 
 
     @CliCommand(value = "report execute", help = "Execute report")
-    public String report(@CliOption(key = {"id", ""}, mandatory = true, help = "id") String id) {
+    public String report(@CliOption(key = {"uri", ""}, mandatory = true, help = "uri") String uri) {
 
         final MetadataService md = holder.getGoodData().getMetadataService();
-        final ReportDefinition rd = md.getObjById(holder.getCurrentProject(), id, ReportDefinition.class);
+        final ReportDefinition rd = md.getObjByUri(uri, ReportDefinition.class);
 
         final ReportService service = holder.getGoodData().getReportService();
         final ByteArrayOutputStream output = new ByteArrayOutputStream();

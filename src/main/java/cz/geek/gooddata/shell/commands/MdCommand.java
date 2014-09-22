@@ -3,8 +3,12 @@ package cz.geek.gooddata.shell.commands;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Entry;
 import com.gooddata.md.Fact;
+import com.gooddata.md.Metric;
 import com.gooddata.md.Queryable;
 import com.gooddata.md.Restriction;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import cz.geek.gooddata.shell.components.GoodDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -24,7 +28,8 @@ import static cz.geek.gooddata.shell.Utils.entryCollectionToString;
 public class MdCommand extends GoodDataCommand {
 
     static enum MdType {
-        attribute(Attribute.class), fact(Fact.class);
+        attribute(Attribute.class), fact(Fact.class), metric(Metric.class),
+        report(Report.class), reportdefinition(ReportDefinition.class);
 
         private final Class<? extends Queryable> cls;
 
