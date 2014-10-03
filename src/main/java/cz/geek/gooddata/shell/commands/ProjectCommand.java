@@ -10,7 +10,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProjectCommand extends GoodDataCommand {
+public class ProjectCommand extends AbstractGoodDataCommand {
 
     @Autowired
     public ProjectCommand(final GoodDataHolder holder) {
@@ -25,7 +25,7 @@ public class ProjectCommand extends GoodDataCommand {
     @CliCommand(value = "project list", help = "List GoodData projects")
     public String list() {
         final StringBuilder builder = new StringBuilder();
-        for (Project project: holder.getGoodData().getProjectService().getProjects()) {
+        for (Project project: getGoodData().getProjectService().getProjects()) {
             builder.append(project.getSelfLink()).append(' ').append(project.getTitle()).append('\n');
         }
         return builder.toString();
@@ -39,7 +39,7 @@ public class ProjectCommand extends GoodDataCommand {
     ) {
         final Project p = new Project(title, token);
         p.setProjectTemplate(template);
-        final Project project = holder.getGoodData().getProjectService().createProject(p).get();
+        final Project project = getGoodData().getProjectService().createProject(p).get();
         holder.setCurrentProject(project);
         return "Created project: " + project.getSelfLink();
     }
@@ -48,12 +48,12 @@ public class ProjectCommand extends GoodDataCommand {
     public String project(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String projectId) {
         if (projectId !=  null) {
 
-            final ProjectService service = holder.getGoodData().getProjectService();
+            final ProjectService service = getGoodData().getProjectService();
             final Project project = Project.TEMPLATE.matches(projectId) ? service.getProjectByUri(projectId) : service.getProjectById(projectId);
             holder.setCurrentProject(project);
         }
         if (holder.hasCurrentProject()) {
-            return "Current project: " + holder.getCurrentProject().getSelfLink();
+            return "Current project: " + getCurrentProject().getSelfLink();
         } else {
             return "No current project";
         }

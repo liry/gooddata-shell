@@ -20,7 +20,7 @@ import java.util.Collection;
 /**
  */
 @Component
-public class ReportCommand extends GoodDataCommand {
+public class ReportCommand extends AbstractGoodDataCommand {
 
     @Autowired
     public ReportCommand(final GoodDataHolder holder) {
@@ -36,10 +36,10 @@ public class ReportCommand extends GoodDataCommand {
     @CliCommand(value = "report execute", help = "Execute report")
     public String report(@CliOption(key = {"uri", ""}, mandatory = true, help = "uri") String uri) {
 
-        final MetadataService md = holder.getGoodData().getMetadataService();
+        final MetadataService md = getGoodData().getMetadataService();
         final ReportDefinition rd = md.getObjByUri(uri, ReportDefinition.class);
 
-        final ReportService service = holder.getGoodData().getReportService();
+        final ReportService service = getGoodData().getReportService();
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         service.exportReport(rd, ReportExportFormat.CSV, output);
         return new String(output.toByteArray(), StandardCharsets.UTF_8);
@@ -48,8 +48,8 @@ public class ReportCommand extends GoodDataCommand {
     @CliCommand(value = "report list", help = "List reports")
     public String list() {
 
-        final MetadataService md = holder.getGoodData().getMetadataService();
-        final Collection<Entry> list = md.find(holder.getCurrentProject(), ReportDefinition.class);
+        final MetadataService md = getGoodData().getMetadataService();
+        final Collection<Entry> list = md.find(getCurrentProject(), ReportDefinition.class);
 
         return Utils.entryCollectionToString(list);
     }

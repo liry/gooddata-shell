@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  */
 @Component
-public class LoginCommand extends GoodDataCommand {
+public class LoginCommand extends AbstractGoodDataCommand {
 
     @Autowired
     public LoginCommand(final GoodDataHolder holder) {
@@ -34,9 +34,9 @@ public class LoginCommand extends GoodDataCommand {
             pass = cr.readLine("Password: ", '*');
         }
         holder.login(host, user, pass);
-        final Account current = holder.getGoodData().getAccountService().getCurrent();
+        final Account current = getGoodData().getAccountService().getCurrent();
         if (projectId != null) {
-            final Project project = holder.getGoodData().getProjectService().getProjectById(projectId);
+            final Project project = getGoodData().getProjectService().getProjectById(projectId);
             holder.setCurrentProject(project);
         }
         return "Logged: " + current.getSelfLink() + " " + current.getFirstName() + " " + current.getLastName();

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  */
 @Component
-public class MaqlCommand extends GoodDataCommand {
+public class MaqlCommand extends AbstractGoodDataCommand {
 
     @Autowired
     public MaqlCommand(final GoodDataHolder holder) {
@@ -26,7 +26,7 @@ public class MaqlCommand extends GoodDataCommand {
     @CliCommand(value = "maql", help = "Execute MAQL DDL")
     public String maql(@CliOption(key = {"maql", ""}, mandatory = true, help = "MAQL DDL") String maql) {
 
-        holder.getGoodData().getModelService().updateProjectModel(holder.getCurrentProject(), maql).get();
+        getGoodData().getModelService().updateProjectModel(getCurrentProject(), maql).get();
         return "Executed";
     }
 

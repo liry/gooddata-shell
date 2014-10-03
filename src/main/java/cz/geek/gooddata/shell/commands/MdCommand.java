@@ -25,7 +25,7 @@ import static cz.geek.gooddata.shell.Utils.entryCollectionToString;
 /**
  */
 @Component
-public class MdCommand extends GoodDataCommand {
+public class MdCommand extends AbstractGoodDataCommand {
 
     static enum MdType {
         attribute(Attribute.class), fact(Fact.class), metric(Metric.class),
@@ -57,7 +57,7 @@ public class MdCommand extends GoodDataCommand {
             restrictions.add(Restriction.identifier(id));
         }
         final Restriction[] restr = restrictions.toArray(new Restriction[restrictions.size()]);
-        final Collection<Entry> entries = holder.getGoodData().getMetadataService().find(holder.getCurrentProject(), type.cls, restr);
+        final Collection<Entry> entries = getGoodData().getMetadataService().find(getCurrentProject(), type.cls, restr);
         return entryCollectionToString(entries);
     }
 

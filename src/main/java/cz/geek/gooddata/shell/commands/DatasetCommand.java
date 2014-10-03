@@ -19,7 +19,7 @@ import java.util.List;
 /**
  */
 @Component
-public class DatasetCommand extends GoodDataCommand {
+public class DatasetCommand extends AbstractGoodDataCommand {
 
     @Autowired
     public DatasetCommand(final GoodDataHolder holder) {
@@ -37,13 +37,13 @@ public class DatasetCommand extends GoodDataCommand {
             @CliOption(key = {"dataset", ""}, mandatory = true, help = "Dataset id") String dataset,
             @CliOption(key = {"csv"}, mandatory = true, help = "CSV file") File csv) throws FileNotFoundException {
 
-        holder.getGoodData().getDatasetService().loadDataset(holder.getCurrentProject(), dataset, new FileInputStream(csv));
+        getGoodData().getDatasetService().loadDataset(getCurrentProject(), dataset, new FileInputStream(csv));
         return "Loaded dataset: " + dataset;
     }
 
     @CliCommand(value = "dataset list", help = "List datasets")
     public String list() {
-        final Collection<Dataset> datasets = holder.getGoodData().getDatasetService().listDatasets(holder.getCurrentProject());
+        final Collection<Dataset> datasets = getGoodData().getDatasetService().listDatasets(getCurrentProject());
         final List<String> result = new ArrayList<String>();
         for (Dataset dataset: datasets) {
             result.add(dataset.getLink() + " " + dataset.getIdentifier() + " " + dataset.getTitle());

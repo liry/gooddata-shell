@@ -18,7 +18,7 @@ import java.io.InputStream;
 /**
  */
 @Component
-public class StorageCommand extends GoodDataCommand {
+public class StorageCommand extends AbstractGoodDataCommand {
 
     @Autowired
     public StorageCommand(final GoodDataHolder holder) {
@@ -37,7 +37,7 @@ public class StorageCommand extends GoodDataCommand {
             @CliOption(key = {"dst"}, mandatory = false, help = "Destination") String dst) throws FileNotFoundException {
 
         final String name = dst != null ? dst : src.getName();
-        holder.getGoodData().getDataStoreService().upload(name, new FileInputStream(src));
+        getGoodData().getDataStoreService().upload(name, new FileInputStream(src));
         return "uploaded to " + name;
     }
 
@@ -47,7 +47,7 @@ public class StorageCommand extends GoodDataCommand {
             @CliOption(key = {"dst"}, mandatory = false, help = "Destination") File dst) throws IOException {
 
         final File name = dst != null ? dst : new File(src);
-        final InputStream stream = holder.getGoodData().getDataStoreService().download(src);
+        final InputStream stream = getGoodData().getDataStoreService().download(src);
         StreamUtils.copy(stream, new FileOutputStream(name));
         return "downloaded to " + name;
     }
