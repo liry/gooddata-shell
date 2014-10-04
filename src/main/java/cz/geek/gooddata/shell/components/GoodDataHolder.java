@@ -2,6 +2,7 @@ package cz.geek.gooddata.shell.components;
 
 import com.gooddata.GoodData;
 import com.gooddata.project.Project;
+import cz.geek.gooddata.shell.output.OutputFormatter;
 import org.springframework.stereotype.Component;
 
 import static com.gooddata.Validate.notNull;
@@ -14,6 +15,8 @@ public class GoodDataHolder {
     private Project currentProject;
 
     private String host;
+
+    private OutputFormatter outputFormatter = OutputFormatter.pretty;
 
     public GoodData getGoodData() {
         notNull(goodData, "gooddata");
@@ -43,5 +46,13 @@ public class GoodDataHolder {
 
     public String getHost() {
         return host;
+    }
+
+    public OutputFormatter getOutputFormatter() {
+        return outputFormatter;
+    }
+
+    public void setOutputFormatter(OutputFormatter outputFormatter) {
+        this.outputFormatter = notNull(outputFormatter, "output formatter");
     }
 }

@@ -4,6 +4,7 @@ import com.gooddata.dataset.Dataset;
 import com.gooddata.dataset.DatasetManifest;
 import com.gooddata.dataset.DatasetService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
+import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -16,8 +17,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -108,12 +107,13 @@ public class DatasetCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "dataset list", help = "List datasets")
     public String list() {
-        final Collection<Dataset> datasets = getGoodData().getDatasetService().listDatasets(getCurrentProject());
-        final List<String> result = new ArrayList<>();
-        for (Dataset dataset: datasets) {
-            result.add(dataset.getLink() + " " + dataset.getIdentifier() + " " + dataset.getTitle());
-        }
-        return StringUtils.collectionToDelimitedString(result, "\n");
+        return print(getGoodData().getDatasetService().listDatasets(getCurrentProject()),
+                asList("URI", "Identifier", "Title"), new RowExtractor<Dataset>() {
+            @Override
+            public List<?> extract(Dataset dataset) {
+                return asList(dataset.getLink(), dataset.getIdentifier(), dataset.getTitle());
+            }
+        });
     }
 
     public static enum UploadMode {

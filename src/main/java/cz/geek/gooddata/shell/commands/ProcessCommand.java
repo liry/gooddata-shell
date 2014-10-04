@@ -5,20 +5,20 @@ import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.dataload.processes.ProcessService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
+import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  */
@@ -37,12 +37,13 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "process list", help = "List processes")
     public String list() {
-        final Collection<Process> processes = getGoodData().getProcessService().listProcesses(getCurrentProject());
-        final List<String> result = new ArrayList<>();
-        for (Process dataset: processes) {
-            result.add(dataset.getSelfLink() + " " + dataset.getName() + " " + dataset.getExecutables());
-        }
-        return StringUtils.collectionToDelimitedString(result, "\n");
+        return print(getGoodData().getProcessService().listProcesses(getCurrentProject()), asList("URI", "Name", "Executables"),
+                new RowExtractor<Process>() {
+            @Override
+            public List<?> extract(Process process) {
+                return asList(process.getSelfLink(), process.getName(), process.getExecutables());
+            }
+        });
     }
 
 

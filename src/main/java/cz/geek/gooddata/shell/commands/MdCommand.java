@@ -1,7 +1,6 @@
 package cz.geek.gooddata.shell.commands;
 
 import com.gooddata.md.Attribute;
-import com.gooddata.md.Entry;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Queryable;
@@ -17,10 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import static cz.geek.gooddata.shell.Utils.entryCollectionToString;
 
 /**
  */
@@ -57,8 +53,7 @@ public class MdCommand extends AbstractGoodDataCommand {
             restrictions.add(Restriction.identifier(id));
         }
         final Restriction[] restr = restrictions.toArray(new Restriction[restrictions.size()]);
-        final Collection<Entry> entries = getGoodData().getMetadataService().find(getCurrentProject(), type.cls, restr);
-        return entryCollectionToString(entries);
+        return printEntries(getGoodData().getMetadataService().find(getCurrentProject(), type.cls, restr));
     }
 
 }

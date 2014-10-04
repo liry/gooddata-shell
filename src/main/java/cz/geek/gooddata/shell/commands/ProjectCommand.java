@@ -3,11 +3,16 @@ package cz.geek.gooddata.shell.commands;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
+import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Component
 public class ProjectCommand extends AbstractGoodDataCommand {
@@ -24,11 +29,12 @@ public class ProjectCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "project list", help = "List GoodData projects")
     public String list() {
-        final StringBuilder builder = new StringBuilder();
-        for (Project project: getGoodData().getProjectService().getProjects()) {
-            builder.append(project.getSelfLink()).append(' ').append(project.getTitle()).append('\n');
-        }
-        return builder.toString();
+        return print(getGoodData().getProjectService().getProjects(), asList("URI", "Title"), new RowExtractor<Project>() {
+            @Override
+            public List<?> extract(Project project) {
+                return asList(project.getSelfLink(), project.getTitle());
+            }
+        });
     }
 
     @CliCommand(value = "project create", help = "Create GoodData project")

@@ -1,11 +1,9 @@
 package cz.geek.gooddata.shell.commands;
 
-import com.gooddata.md.Entry;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
-import cz.geek.gooddata.shell.Utils;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 
 /**
  */
@@ -47,11 +44,7 @@ public class ReportCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "report list", help = "List reports")
     public String list() {
-
-        final MetadataService md = getGoodData().getMetadataService();
-        final Collection<Entry> list = md.find(getCurrentProject(), ReportDefinition.class);
-
-        return Utils.entryCollectionToString(list);
+        return printEntries(getGoodData().getMetadataService().find(getCurrentProject(), ReportDefinition.class));
     }
 
 }
