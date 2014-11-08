@@ -6,7 +6,8 @@ import com.gooddata.project.Project;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
 import cz.geek.gooddata.shell.output.Table;
-import org.springframework.shell.core.CommandMarker;
+import org.springframework.shell.core.ExecutionProcessor;
+import org.springframework.shell.event.ParseResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +18,7 @@ import java.util.List;
 import static com.gooddata.Validate.notNull;
 import static java.util.Arrays.asList;
 
-public abstract class AbstractGoodDataCommand implements CommandMarker {
+public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
 
     protected final GoodDataHolder holder;
 
@@ -58,4 +59,20 @@ public abstract class AbstractGoodDataCommand implements CommandMarker {
         });
     }
 
+    @Override
+    public ParseResult beforeInvocation(final ParseResult invocationContext) {
+        return invocationContext;
+    }
+
+    @Override
+    public void afterReturningInvocation(final ParseResult invocationContext, final Object result) {
+    }
+
+    @Override
+    public void afterThrowingInvocation(final ParseResult invocationContext, final Throwable thrown) {
+        holder.setLastException(thrown);
+        if (holder.isPrintStackTrace()) {
+            thrown.printStackTrace();
+        }
+    }
 }

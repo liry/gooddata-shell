@@ -16,7 +16,7 @@ public class SetCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"set output"})
+    @CliAvailabilityIndicator({"set output", "set exception"})
     public boolean isAvailable() {
         return true;
     }
@@ -27,5 +27,30 @@ public class SetCommand extends AbstractGoodDataCommand {
             holder.setOutputFormatter(formatter);
         }
         return "Output format set to: '" + holder.getOutputFormatter().toString() + "'";
+    }
+
+    @CliCommand(value = "set exception", help = "Set exception logging / show the last exception")
+    public String setException(@CliOption(key = {"", "format"}, mandatory = false, help = "Get or set exception") ExceptionFormat format) {
+        if (format != null) {
+            switch (format) {
+                case message:
+                    holder.setPrintStackTrace(false);
+                    break;
+                case full:
+                    holder.setPrintStackTrace(true);
+                    break;
+                case last:
+                    if (holder.getLastException() != null) {
+                        holder.getLastException().printStackTrace(System.err);
+                        return "";
+                    }
+            }
+
+        }
+        return "Exception format set to: '" + (holder.isPrintStackTrace() ? ExceptionFormat.full : ExceptionFormat.message) + "'";
+    }
+
+    static enum ExceptionFormat {
+        message, full, last
     }
 }

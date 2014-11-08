@@ -18,6 +18,10 @@ public class GoodDataHolder {
 
     private OutputFormatter outputFormatter = OutputFormatter.pretty;
 
+    private Throwable lastException;
+
+    private boolean printStackTrace;
+
     public GoodData getGoodData() {
         notNull(goodData, "gooddata");
         return goodData;
@@ -54,5 +58,21 @@ public class GoodDataHolder {
 
     public void setOutputFormatter(OutputFormatter outputFormatter) {
         this.outputFormatter = notNull(outputFormatter, "output formatter");
+    }
+
+    public void setLastException(final Throwable lastException) {
+        this.lastException = lastException;
+    }
+
+    public Throwable getLastException() {
+        return lastException;
+    }
+
+    public void setPrintStackTrace(final boolean printStackTrace) {
+        this.printStackTrace = printStackTrace;
+    }
+
+    public boolean isPrintStackTrace() {
+        return printStackTrace;
     }
 }
