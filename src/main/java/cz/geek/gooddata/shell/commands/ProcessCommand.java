@@ -1,6 +1,6 @@
 package cz.geek.gooddata.shell.commands;
 
-import com.gooddata.dataload.processes.Process;
+import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.dataload.processes.ProcessService;
@@ -38,10 +38,10 @@ public class ProcessCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "process list", help = "List processes")
     public String list() {
         return print(getGoodData().getProcessService().listProcesses(getCurrentProject()), asList("URI", "Name", "Executables"),
-                new RowExtractor<Process>() {
+                new RowExtractor<DataloadProcess>() {
             @Override
-            public List<?> extract(Process process) {
-                return asList(process.getSelfLink(), process.getName(), process.getExecutables());
+            public List<?> extract(DataloadProcess process) {
+                return asList(process.getUri(), process.getName(), process.getExecutables());
             }
         });
     }
@@ -55,7 +55,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             @CliOption(key = {"source"}, mandatory = false, help = "Process file or directory") File data) {
 
         final ProcessService service = getGoodData().getProcessService();
-        Process process;
+        DataloadProcess process;
         if (processUri != null) {
             process = service.getProcessByUri(processUri);
             if (name != null) {
@@ -70,10 +70,10 @@ public class ProcessCommand extends AbstractGoodDataCommand {
                 e.printStackTrace();
             }
         } else {
-            process = service.createProcess(getCurrentProject(), new Process(name, type), data);
+            process = service.createProcess(getCurrentProject(), new DataloadProcess(name, type), data);
         }
 
-        return "Uploaded process: " + process.getSelfLink();
+        return "Uploaded process: " + process.getUri();
     }
 
 
@@ -81,7 +81,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
     public String download(@CliOption(key = {"process"}, mandatory = true, help = "Process URI") final String processUri,
                            @CliOption(key = {"target"}, mandatory = false, help = "Target dir") final String target) throws FileNotFoundException {
         final ProcessService service = getGoodData().getProcessService();
-        final Process process = service.getProcessByUri(processUri);
+        final DataloadProcess process = service.getProcessByUri(processUri);
         service.getProcessSource(process, new FileOutputStream(target));
         return "Downloaded.";
     }
@@ -92,7 +92,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
                           @CliOption(key = {"log"}, mandatory = false, help = "Show execution log",
                                   unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") final boolean log) {
         final ProcessService service = getGoodData().getProcessService();
-        final Process process = service.getProcessByUri(processUri);
+        final DataloadProcess process = service.getProcessByUri(processUri);
         final ProcessExecutionDetail detail = service.executeProcess(new ProcessExecution(process, executable)).get();
         // todo execution uri
         String result = "Executed process: " + detail.getStatus();

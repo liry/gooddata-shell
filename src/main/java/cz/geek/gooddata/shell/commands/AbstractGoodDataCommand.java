@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.gooddata.Validate.notNull;
+import static com.gooddata.util.Validate.notNull;
 import static java.util.Arrays.asList;
 
 public abstract class AbstractGoodDataCommand implements ExecutionProcessor {

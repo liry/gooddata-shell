@@ -39,6 +39,6 @@ public class LoginCommand extends AbstractGoodDataCommand {
             final Project project = getGoodData().getProjectService().getProjectById(projectId);
             holder.setCurrentProject(project);
         }
-        return "Logged: " + current.getSelfLink() + " " + current.getFirstName() + " " + current.getLastName();
+        return "Logged: " + current.getUri() + " " + current.getFirstName() + " " + current.getLastName();
     }
 }

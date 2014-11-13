@@ -32,7 +32,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         return print(getGoodData().getProjectService().getProjects(), asList("URI", "Title"), new RowExtractor<Project>() {
             @Override
             public List<?> extract(Project project) {
-                return asList(project.getSelfLink(), project.getTitle());
+                return asList(project.getUri(), project.getTitle());
             }
         });
     }
@@ -47,7 +47,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         p.setProjectTemplate(template);
         final Project project = getGoodData().getProjectService().createProject(p).get();
         holder.setCurrentProject(project);
-        return "Created project: " + project.getSelfLink();
+        return "Created project: " + project.getUri();
     }
 
     @CliCommand(value = "project use", help = "Get or set current GoodData project")
@@ -59,7 +59,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
             holder.setCurrentProject(project);
         }
         if (holder.hasCurrentProject()) {
-            return "Current project: " + getCurrentProject().getSelfLink();
+            return "Current project: " + getCurrentProject().getUri();
         } else {
             return "No current project";
         }

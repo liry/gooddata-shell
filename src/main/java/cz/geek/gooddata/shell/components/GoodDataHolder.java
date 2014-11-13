@@ -5,7 +5,7 @@ import com.gooddata.project.Project;
 import cz.geek.gooddata.shell.output.OutputFormatter;
 import org.springframework.stereotype.Component;
 
-import static com.gooddata.Validate.notNull;
+import static com.gooddata.util.Validate.notNull;
 
 @Component
 public class GoodDataHolder {
