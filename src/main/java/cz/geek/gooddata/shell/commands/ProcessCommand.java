@@ -79,9 +79,12 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "process download", help = "Download process")
     public String download(@CliOption(key = {"process"}, mandatory = true, help = "Process URI") final String processUri,
-                           @CliOption(key = {"target"}, mandatory = false, help = "Target dir") final String target) throws FileNotFoundException {
+                           @CliOption(key = {"target"}, mandatory = false, help = "Target dir") String target) throws FileNotFoundException {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
+        if (target == null) {
+            target = process.getName() + ".zip";
+        }
         service.getProcessSource(process, new FileOutputStream(target));
         return "Downloaded.";
     }
@@ -90,12 +93,11 @@ public class ProcessCommand extends AbstractGoodDataCommand {
     public String execute(@CliOption(key = {"process"}, mandatory = true, help = "Process URI") final String processUri,
                           @CliOption(key = {"executable"}, mandatory = true, help = "Executable") final String executable,
                           @CliOption(key = {"log"}, mandatory = false, help = "Show execution log",
-                                  unspecifiedDefaultValue = "false", specifiedDefaultValue = "false") final boolean log) {
+                                  unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean log) {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
         final ProcessExecutionDetail detail = service.executeProcess(new ProcessExecution(process, executable)).get();
-        // todo execution uri
-        String result = "Executed process: " + detail.getStatus();
+        String result = "Executed process " + detail.getUri() + ": " + detail.getStatus();
         if (log) {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             service.getExecutionLog(detail, out);
