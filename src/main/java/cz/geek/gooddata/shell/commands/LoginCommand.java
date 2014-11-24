@@ -27,7 +27,7 @@ public class LoginCommand extends AbstractGoodDataCommand {
             @CliOption(key = {"user"}, mandatory = true, help = "User name") String user,
             @CliOption(key = {"pass"}, mandatory = false, help = "Password") String pass,
             @CliOption(key = {"host"}, mandatory = false, help = "Host") String host,
-            @CliOption(key = {"project"}, mandatory = false, help = "Current project") String projectId) throws IOException {
+            @CliOption(key = {"project"}, mandatory = false, help = "Current project URI") String projectUri) throws IOException {
 
         if (StringUtils.isBlank(pass)) {
             final ConsoleReader cr = new ConsoleReader();
@@ -35,8 +35,8 @@ public class LoginCommand extends AbstractGoodDataCommand {
         }
         holder.login(host, user, pass);
         final Account current = getGoodData().getAccountService().getCurrent();
-        if (projectId != null) {
-            final Project project = getGoodData().getProjectService().getProjectById(projectId);
+        if (projectUri != null) {
+            final Project project = getGoodData().getProjectService().getProjectByUri(projectUri);
             holder.setCurrentProject(project);
         }
         return "Logged: " + current.getUri() + " " + current.getFirstName() + " " + current.getLastName();
