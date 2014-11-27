@@ -1,5 +1,6 @@
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.FutureResult;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
@@ -49,10 +50,10 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "process upload", help = "Create or update process")
     public String load(
-            @CliOption(key = {"process"}, mandatory = false, help = "Process URI") final String processUri,
+            @CliOption(key = {"uri"}, mandatory = false, help = "Process URI of existing process to be updated") String processUri,
             @CliOption(key = {"name"}, mandatory = false, help = "Process name") String name,
             @CliOption(key = {"type"}, mandatory = false, help = "Process type") String type,
-            @CliOption(key = {"source"}, mandatory = false, help = "Process file or directory") File data) {
+            @CliOption(key = {"source"}, mandatory = true, help = "Process file or directory") File data) {
 
         final ProcessService service = getGoodData().getProcessService();
         DataloadProcess process;
@@ -64,11 +65,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             if (type != null) {
                 process.setType(type);
             }
-            try {
-                process = service.updateProcess(getCurrentProject(), process, data);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            process = service.updateProcess(getCurrentProject(), process, data);
         } else {
             process = service.createProcess(getCurrentProject(), new DataloadProcess(name, type), data);
         }
@@ -78,32 +75,40 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
 
     @CliCommand(value = "process download", help = "Download process")
-    public String download(@CliOption(key = {"process"}, mandatory = true, help = "Process URI") final String processUri,
-                           @CliOption(key = {"target"}, mandatory = false, help = "Target dir") String target) throws FileNotFoundException {
+    public String download(@CliOption(key = {"uri"}, mandatory = true, help = "Process URI") String processUri,
+                           @CliOption(key = {"target"}, mandatory = false, help = "Target dir") File target) throws FileNotFoundException {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
         if (target == null) {
-            target = process.getName() + ".zip";
+            target = new File(process.getName() + ".zip");
         }
         service.getProcessSource(process, new FileOutputStream(target));
-        return "Downloaded.";
+        return "Downloaded to " + target.getAbsolutePath();
     }
 
     @CliCommand(value = "process execute", help = "Execute process")
-    public String execute(@CliOption(key = {"process"}, mandatory = true, help = "Process URI") final String processUri,
+    public String execute(@CliOption(key = {"uri"}, mandatory = true, help = "Process URI") final String processUri,
                           @CliOption(key = {"executable"}, mandatory = true, help = "Executable") final String executable,
+                          @CliOption(key = {"wait"}, mandatory = false, help = "Wait for completion",
+                                   unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean wait,
                           @CliOption(key = {"log"}, mandatory = false, help = "Show execution log",
                                   unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean log) {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
-        final ProcessExecutionDetail detail = service.executeProcess(new ProcessExecution(process, executable)).get();
-        String result = "Executed process " + detail.getUri() + ": " + detail.getStatus();
-        if (log) {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            service.getExecutionLog(detail, out);
-            result += "\n" + out.toString();
+        final FutureResult<ProcessExecutionDetail> futureResult = service.executeProcess(new ProcessExecution(process, executable));
+        if (wait) {
+            System.out.println(futureResult.getPollingUri());
+            final ProcessExecutionDetail detail = futureResult.get();
+            String result = "Executed process " + detail.getUri() + ": " + detail.getStatus();
+            if (log) {
+                final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                service.getExecutionLog(detail, out);
+                result += "\n" + out.toString();
+            }
+            return result;
+        } else {
+            return futureResult.getPollingUri();
         }
-        return result;
     }
 
 }
