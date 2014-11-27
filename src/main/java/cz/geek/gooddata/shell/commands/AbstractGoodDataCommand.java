@@ -4,6 +4,7 @@ import com.gooddata.GoodData;
 import com.gooddata.md.Entry;
 import com.gooddata.project.Project;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
+import cz.geek.gooddata.shell.components.MyGoodData;
 import cz.geek.gooddata.shell.output.RowExtractor;
 import cz.geek.gooddata.shell.output.Table;
 import org.springframework.shell.core.ExecutionProcessor;
@@ -26,7 +27,7 @@ public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
         this.holder = notNull(holder, "holder");
     }
 
-    public GoodData getGoodData() {
+    public MyGoodData getGoodData() {
         return holder.getGoodData();
     }
 

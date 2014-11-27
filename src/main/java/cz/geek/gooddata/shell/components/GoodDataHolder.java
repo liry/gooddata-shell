@@ -10,7 +10,7 @@ import static com.gooddata.util.Validate.notNull;
 @Component
 public class GoodDataHolder {
 
-    private GoodData goodData;
+    private MyGoodData goodData;
 
     private Project currentProject;
 
@@ -22,13 +22,13 @@ public class GoodDataHolder {
 
     private boolean printStackTrace;
 
-    public GoodData getGoodData() {
+    public MyGoodData getGoodData() {
         notNull(goodData, "gooddata");
         return goodData;
     }
 
     public void login(final String host, final String user, final String pass) {
-        goodData = host == null ? new GoodData(user, pass) : new GoodData(host, user, pass);
+        goodData = host == null ? new MyGoodData(user, pass) : new MyGoodData(host, user, pass);
         this.host = host == null ? "secure" : host.substring(0, host.indexOf('.'));
     }
 
