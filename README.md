@@ -11,7 +11,7 @@ It is built on the [GoodData Java SDK](https://github.com/martiner/gooddata-java
 * tab completions
 * command history
 * colorized output
-* script execution
+* script execution (run with `--cmdfile file.txt` command line argument or use `script` command)
 
 ## Usage
 
