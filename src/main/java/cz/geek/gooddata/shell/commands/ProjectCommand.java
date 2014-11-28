@@ -22,7 +22,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"project list", "project create", "project use"})
+    @CliAvailabilityIndicator({"project list", "project create", "project delete", "project use"})
     public boolean isAvailable() {
         return holder.hasGoodData();
     }
@@ -51,18 +51,28 @@ public class ProjectCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "project use", help = "Get or set current GoodData project")
-    public String project(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String projectId) {
-        if (projectId !=  null) {
-
-            final ProjectService service = getGoodData().getProjectService();
-            final Project project = Project.TEMPLATE.matches(projectId) ? service.getProjectByUri(projectId) : service.getProjectById(projectId);
-            holder.setCurrentProject(project);
+    public String project(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String project) {
+        if (project !=  null) {
+            final Project p = getProject(project);
+            holder.setCurrentProject(p);
         }
         if (holder.hasCurrentProject()) {
             return "Current project: " + getCurrentProject().getUri();
         } else {
             return "No current project";
         }
+    }
+
+    @CliCommand(value = "project delete", help = "Delete GoodData project")
+    public String delete(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String project) {
+        final Project p = getProject(project);
+        getGoodData().getProjectService().removeProject(p);
+        return "Removed " + p.getUri();
+    }
+
+    private Project getProject(final String project) {
+        final ProjectService service = getGoodData().getProjectService();
+        return Project.TEMPLATE.matches(project) ? service.getProjectByUri(project) : service.getProjectById(project);
     }
 
 }
