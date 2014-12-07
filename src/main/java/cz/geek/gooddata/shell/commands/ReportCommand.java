@@ -1,5 +1,6 @@
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.report.ReportExportFormat;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
@@ -37,17 +38,25 @@ public class ReportCommand extends AbstractGoodDataCommand {
     }
 
 
-    @CliCommand(value = "report execute", help = "Execute report")
-    public String report(@CliOption(key = {"uri", ""}, mandatory = true, help = "uri") String uri) throws IOException {
-
-        final ReportDefinition rd = getGoodData().getMetadataService().getObjByUri(uri, ReportDefinition.class);
-
+    @CliCommand(value = "report export", help = "Export report")
+    public String report(@CliOption(key = {"uri", ""}, mandatory = false, help = "Report URI") String reportUri,
+                         @CliOption(key = {"definition"}, mandatory = false, help = "Report definition URI") String definitionUri
+                        ) throws IOException {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        getGoodData().getReportService().exportReport(rd, ReportExportFormat.CSV, output);
+
+        if (reportUri != null) {
+            final Report report = getGoodData().getMetadataService().getObjByUri(reportUri, Report.class);
+            getGoodData().getReportService().exportReport(report, ReportExportFormat.CSV, output).get();
+        } else if (definitionUri != null) {
+            final ReportDefinition rd = getGoodData().getMetadataService().getObjByUri(definitionUri, ReportDefinition.class);
+            getGoodData().getReportService().exportReport(rd, ReportExportFormat.CSV, output).get();
+        } else {
+            throw new IllegalArgumentException("Report or Report definition URI must be specified");
+        }
 
         final ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
         final List<List<String>> result = new ArrayList<>();
-        List<String> header = null;
+        final List<String> header;
         try (CsvListReader reader = new CsvListReader(new InputStreamReader(input, UTF_8), STANDARD_PREFERENCE)) {
             header = reader.read();
             List<String> row;
@@ -64,8 +73,9 @@ public class ReportCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "report list", help = "List reports")
-    public String list() {
-        return printEntries(getGoodData().getMetadataService().find(getCurrentProject(), ReportDefinition.class));
+    public String list(@CliOption(key = {"definition"}, mandatory = false, help = "List definitions",
+            unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean definition) {
+        return printEntries(getGoodData().getMetadataService().find(getCurrentProject(), definition ? ReportDefinition.class : Report.class));
     }
 
 }
