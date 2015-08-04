@@ -44,7 +44,7 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "connector create", help = "Create integration")
-    public String execute(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
+    public String create(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
                           @CliOption(key = {"url"}, mandatory = true, help = "API URL") final String url) {
         final ConnectorService service = getGoodData().getConnectorService();
         final Settings settings;
@@ -60,14 +60,14 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "connector execute", help = "Execute process")
     public String execute(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
-                          /*@CliOption(key = {"incremental"}, mandatory = false, help = "Incremental") final Boolean incremental,*/
+                          @CliOption(key = {"incremental"}, mandatory = false, help = "Incremental") final Boolean incremental,
                           @CliOption(key = {"wait"}, mandatory = false, help = "Show execution log",
                                   unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean wait) {
         final ConnectorService service = getGoodData().getConnectorService();
         final Zendesk4ProcessExecution execution = new Zendesk4ProcessExecution();
-        /*if (incremental != null) {
+        if (incremental != null) {
             execution.setIncremental(incremental);
-        }*/
+        }
         final FutureResult<ProcessStatus> result = service.executeProcess(getCurrentProject(), execution);
         if (wait) {
             System.out.println(result.getPollingUri());
