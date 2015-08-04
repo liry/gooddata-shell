@@ -32,6 +32,11 @@ public class GoodDataHolder {
         this.host = host == null ? "secure" : host.substring(0, host.indexOf('.'));
     }
 
+    public void logout() {
+        goodData.logout();
+        goodData = null;
+    }
+
     public void setCurrentProject(final Project currentProject) {
         this.currentProject = currentProject;
     }
