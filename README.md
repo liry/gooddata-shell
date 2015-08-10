@@ -15,7 +15,11 @@ It is built on the [GoodData Java SDK](https://github.com/martiner/gooddata-java
 
 ## Usage
 
-1. Download
+1. [Download](https://github.com/martiner/gooddata-shell/releases)
 2. Run `java -jar gooddata-shell-1.0-SNAPSHOT.jar`
 3. Type `help` to get started
 
+## Develop
+
+1. `mvn package`
+2. `mvn exec:java`
