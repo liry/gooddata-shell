@@ -38,7 +38,7 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"connector execute", "connector create"})
+    @CliAvailabilityIndicator({"connector execute", "connector create", "connector update"})
     public boolean isAvailable() {
         return holder.hasCurrentProject();
     }
@@ -47,13 +47,7 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
     public String create(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
                           @CliOption(key = {"url"}, mandatory = true, help = "API URL") final String url) {
         final ConnectorService service = getGoodData().getConnectorService();
-        final Settings settings;
-        switch (connector) {
-            case ZENDESK4:
-                settings = new Zendesk4Settings(url);
-                break;
-            default: throw new IllegalArgumentException("Unsupported connector " + connector);
-        }
+        final Settings settings = getSettings(connector, url);
         service.createIntegration(getCurrentProject(), settings);
         return "OK";
     }
@@ -75,6 +69,26 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
         } else {
             return result.getPollingUri();
         }
+    }
+
+    @CliCommand(value = "connector update", help = "Update integration")
+    public String update(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
+            @CliOption(key = {"url"}, mandatory = true, help = "API URL") final String url) {
+        final ConnectorService service = getGoodData().getConnectorService();
+        final Settings settings = getSettings(connector, url);
+        service.updateSettings(getCurrentProject(), settings);
+        return "OK";
+    }
+
+    private static Settings getSettings(ConnectorType connector, String url) {
+        final Settings settings;
+        switch (connector) {
+            case ZENDESK4:
+                settings = new Zendesk4Settings(url);
+                break;
+            default: throw new IllegalArgumentException("Unsupported connector " + connector);
+        }
+        return settings;
     }
 
 }
