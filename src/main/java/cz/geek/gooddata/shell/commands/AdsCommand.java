@@ -3,6 +3,7 @@
  */
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.project.Environment;
 import com.gooddata.warehouse.Warehouse;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
@@ -41,12 +42,15 @@ public class AdsCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "ads create", help = "Create ADS instances")
-    public String create(@CliOption(key = {"title"}, mandatory = true, help = "Title") String title,
-                @CliOption(key = {"token"}, mandatory = true, help = "Token") String token,
-                @CliOption(key = {"description"}, mandatory = false, help = "Description") String description
-                ) {
+    public String create(@CliOption(key = "title", mandatory = true, help = "Title") String title,
+                         @CliOption(key = "token", mandatory = true, help = "Token") String token,
+                         @CliOption(key = "description", help = "Description") String description,
+                         @CliOption(key = "env", help = "Environment") Environment env) {
         final Warehouse warehouse = new Warehouse(title, token);
         warehouse.setDescription(description);
+        if (env != null) {
+            warehouse.setEnvironment(env);
+        }
         return "Created ADS instance: " + getGoodData().getWarehouseService().createWarehouse(warehouse).get().getUri();
     }
 }

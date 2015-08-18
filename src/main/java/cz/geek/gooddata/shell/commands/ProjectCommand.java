@@ -1,5 +1,6 @@
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
@@ -41,10 +42,14 @@ public class ProjectCommand extends AbstractGoodDataCommand {
     public String create(
             @CliOption(key = {"title"}, mandatory = true, help = "Title") String title,
             @CliOption(key = {"token"}, mandatory = true, help = "Token") String token,
-            @CliOption(key = {"template"}, mandatory = false, help = "Title") String template
+            @CliOption(key = {"template"}, help = "Title") String template,
+            @CliOption(key = "env", help = "Environment") Environment env
     ) {
         final Project p = new Project(title, token);
         p.setProjectTemplate(template);
+        if (env != null) {
+            p.setEnvironment(env);
+        }
         final Project project = getGoodData().getProjectService().createProject(p).get();
         holder.setCurrentProject(project);
         return "Created project: " + project.getUri();
