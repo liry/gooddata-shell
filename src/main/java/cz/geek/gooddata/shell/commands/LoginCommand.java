@@ -3,6 +3,7 @@ package cz.geek.gooddata.shell.commands;
 import com.gooddata.account.Account;
 import com.gooddata.project.Project;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
+import cz.geek.gooddata.shell.components.MyGoodData.Credentials;
 import jline.console.ConsoleReader;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class LoginCommand extends AbstractGoodDataCommand {
             final ConsoleReader cr = new ConsoleReader();
             pass = cr.readLine("Password: ", '*');
         }
-        holder.login(host, user, pass);
+        holder.login(new Credentials(host, user, pass));
         final Account current = getGoodData().getAccountService().getCurrent();
         if (projectUri != null) {
             final Project project = getGoodData().getProjectService().getProjectByUri(projectUri);

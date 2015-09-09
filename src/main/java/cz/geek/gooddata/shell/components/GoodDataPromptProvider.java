@@ -22,10 +22,13 @@ public class GoodDataPromptProvider implements PromptProvider {
         final StringBuilder builder = new StringBuilder();
         builder.append("gdsh");
         if (holder.hasGoodData()) {
-            builder.append(":").append(holder.getHost());
+            builder.append(":").append(holder.getShortHost());
         }
         if (holder.hasCurrentProject()) {
             builder.append(":").append(holder.getCurrentProject().getId());
+        }
+        if (holder.hasCurrentWarehouse()) {
+            builder.append(":").append(holder.getCurrentWarehouse().getWarehouse().getId());
         }
         builder.append("> ");
         return builder.toString();

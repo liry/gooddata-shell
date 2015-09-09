@@ -73,4 +73,9 @@ public class Table {
     public boolean hasHeader() {
         return !header.isEmpty();
     }
+
+    @Override
+    public String toString() {
+        return OutputFormatter.pretty.format(this);
+    }
 }
