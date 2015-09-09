@@ -1,6 +1,5 @@
 package cz.geek.gooddata.shell.commands;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Entry;
 import com.gooddata.project.Project;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
@@ -41,6 +40,10 @@ public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
 
     public <T> String print(Collection<T> collection, List<?> header, RowExtractor<T> extractor) {
         final Table table = new Table(header, collection, extractor);
+        return print(table);
+    }
+
+    public String print(final Table table) {
         return holder.getOutputFormatter().format(table);
     }
 
