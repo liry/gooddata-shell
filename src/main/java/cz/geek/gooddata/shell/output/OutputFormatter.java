@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
-import static org.apache.commons.lang.StringUtils.repeat;
+import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.springframework.util.StringUtils.collectionToDelimitedString;
 
 public enum OutputFormatter {

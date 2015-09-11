@@ -4,7 +4,7 @@ import com.gooddata.account.Account;
 import com.gooddata.project.Project;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import jline.console.ConsoleReader;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
