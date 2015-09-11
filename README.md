@@ -21,5 +21,5 @@ It is built on the [GoodData Java SDK](https://github.com/martiner/gooddata-java
 
 ## Develop
 
-1. `mvn package`
+1. `mvn verify`
 2. `mvn exec:java`
