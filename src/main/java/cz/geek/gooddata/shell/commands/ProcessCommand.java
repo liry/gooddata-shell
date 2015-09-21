@@ -50,7 +50,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "process upload", help = "Create or update process")
     public String load(
-            @CliOption(key = {"uri"}, mandatory = false, help = "Process URI of existing process to be updated") String processUri,
+            @CliOption(key = {"uri", ""}, mandatory = false, help = "Process URI of existing process to be updated") String processUri,
             @CliOption(key = {"name"}, mandatory = false, help = "Process name") String name,
             @CliOption(key = {"type"}, mandatory = false, help = "Process type") String type,
             @CliOption(key = {"source"}, mandatory = true, help = "Process file or directory") File data) {
@@ -75,7 +75,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
 
     @CliCommand(value = "process download", help = "Download process")
-    public String download(@CliOption(key = {"uri"}, mandatory = true, help = "Process URI") String processUri,
+    public String download(@CliOption(key = {"", "uri"}, mandatory = true, help = "Process URI") String processUri,
                            @CliOption(key = {"target"}, mandatory = false, help = "Target dir") File target) throws FileNotFoundException {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
@@ -87,8 +87,8 @@ public class ProcessCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "process execute", help = "Execute process")
-    public String execute(@CliOption(key = {"uri"}, mandatory = true, help = "Process URI") final String processUri,
                           @CliOption(key = {"executable"}, mandatory = true, help = "Executable") final String executable,
+    public String execute(@CliOption(key = {"", "uri"}, mandatory = true, help = "Process URI") final String processUri,
                           @CliOption(key = {"wait"}, mandatory = false, help = "Wait for completion",
                                    unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean wait,
                           @CliOption(key = {"log"}, mandatory = false, help = "Show execution log",
