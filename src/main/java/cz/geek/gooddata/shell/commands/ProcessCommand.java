@@ -96,7 +96,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
         final FutureResult<ProcessExecutionDetail> futureResult = service.executeProcess(new ProcessExecution(process, executable));
-        if (wait) {
+        if (wait || log) {
             System.out.println(futureResult.getPollingUri());
             final ProcessExecutionDetail detail = futureResult.get();
             String result = "Executed process " + detail.getUri() + ": " + detail.getStatus();
