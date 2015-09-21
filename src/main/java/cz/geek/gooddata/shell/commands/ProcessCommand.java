@@ -18,8 +18,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  */
@@ -87,14 +89,24 @@ public class ProcessCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "process execute", help = "Execute process")
-                          @CliOption(key = {"executable"}, mandatory = true, help = "Executable") final String executable,
     public String execute(@CliOption(key = {"", "uri"}, mandatory = true, help = "Process URI") final String processUri,
+                          @CliOption(key = {"executable"}, mandatory = false, help = "Executable") String executable,
                           @CliOption(key = {"wait"}, mandatory = false, help = "Wait for completion",
                                    unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean wait,
                           @CliOption(key = {"log"}, mandatory = false, help = "Show execution log",
                                   unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean log) {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
+
+        if (isEmpty(executable)) {
+            final Set<String> executables = process.getExecutables();
+            if (executables.size() == 1) {
+                executable = executables.iterator().next();
+            } else {
+                throw new IllegalArgumentException("Need to specify 'executable' option with value of " + executables);
+            }
+        }
+
         final FutureResult<ProcessExecutionDetail> futureResult = service.executeProcess(new ProcessExecution(process, executable));
         if (wait || log) {
             System.out.println(futureResult.getPollingUri());
