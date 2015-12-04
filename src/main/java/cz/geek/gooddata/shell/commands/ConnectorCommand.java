@@ -8,25 +8,12 @@ import com.gooddata.connector.ProcessStatus;
 import com.gooddata.connector.Settings;
 import com.gooddata.connector.Zendesk4ProcessExecution;
 import com.gooddata.connector.Zendesk4Settings;
-import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessExecution;
-import com.gooddata.dataload.processes.ProcessExecutionDetail;
-import com.gooddata.dataload.processes.ProcessService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  */
