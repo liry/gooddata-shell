@@ -1,19 +1,31 @@
 package cz.geek.gooddata.shell.commands;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
 import com.gooddata.FutureResult;
 import com.gooddata.connector.ConnectorService;
 import com.gooddata.connector.ConnectorType;
 import com.gooddata.connector.Integration;
+import com.gooddata.connector.IntegrationProcessStatus;
 import com.gooddata.connector.ProcessStatus;
 import com.gooddata.connector.Settings;
 import com.gooddata.connector.Zendesk4ProcessExecution;
 import com.gooddata.connector.Zendesk4Settings;
+import com.google.common.collect.ImmutableMap;
+
 import cz.geek.gooddata.shell.components.GoodDataHolder;
+import cz.geek.gooddata.shell.output.RowExtractor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -25,7 +37,7 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"connector execute", "connector create", "connector update"})
+    @CliAvailabilityIndicator({"connector execute", "connector create", "connector update", "connector show processes"})
     public boolean isAvailable() {
         return holder.hasCurrentProject();
     }
@@ -77,6 +89,30 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
             System.out.println("integration updated");
         }
         return "OK";
+    }
+
+    @CliCommand(value = "connector show processes", help = "Show connector processes")
+    public String showProcesses(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector) {
+        final ConnectorService service = getGoodData().getConnectorService();
+        final Integration integration = service.getIntegration(getCurrentProject(), connector);
+
+        final Map<String, IntegrationProcessStatus> processes = new HashMap<>();
+        processes.put("Last Finished", integration.getLastFinishedProcess());
+        processes.put("Last Successful", integration.getLastSuccessfulProcess());
+        processes.put("Running", integration.getRunningProcess());
+
+        return print(
+                processes.entrySet(),
+                asList("type", "status", "start", "end"),
+                new RowExtractor<Map.Entry<String, IntegrationProcessStatus>>() {
+                    @Override
+                    public List<?> extract(Map.Entry<String, IntegrationProcessStatus> entry) {
+                        final IntegrationProcessStatus process = entry.getValue();
+                        return process == null
+                                ? asList(entry.getKey(), "-", "-", "-")
+                                : asList(entry.getKey(), process.getStatus().getCode(), process.getStarted(), process.getFinished());
+                    }
+                });
     }
 
     private static Settings getSettings(ConnectorType connector, String url) {
