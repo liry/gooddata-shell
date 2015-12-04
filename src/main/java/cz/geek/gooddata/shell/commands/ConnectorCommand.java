@@ -60,10 +60,22 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "connector update", help = "Update integration")
     public String update(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
-            @CliOption(key = {"url"}, mandatory = true, help = "API URL") final String url) {
+            @CliOption(key = {"url"}, mandatory = false, help = "API URL") final String url,
+            @CliOption(key = {"active"}, mandatory = false, help = "Set integration active", specifiedDefaultValue = "true") final Boolean active) {
         final ConnectorService service = getGoodData().getConnectorService();
-        final Settings settings = getSettings(connector, url);
-        service.updateSettings(getCurrentProject(), settings);
+
+        if (url != null) {
+            final Settings settings = getSettings(connector, url);
+            service.updateSettings(getCurrentProject(), settings);
+            System.out.println("settings updated");
+        }
+
+        if (active != null) {
+            final Integration integration = service.getIntegration(getCurrentProject(), connector);
+            integration.setActive(active);
+            service.updateIntegration(getCurrentProject(), connector, integration);
+            System.out.println("integration updated");
+        }
         return "OK";
     }
 
