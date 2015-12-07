@@ -9,11 +9,7 @@ import static java.util.Arrays.asList;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
 
-import com.gooddata.connector.ConnectorService;
-import com.gooddata.connector.ConnectorType;
-import com.gooddata.connector.Settings;
 import com.gooddata.gdc.FeatureFlag;
-import com.gooddata.project.Project;
 import com.gooddata.project.ProjectFeatureFlag;
 import com.gooddata.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
