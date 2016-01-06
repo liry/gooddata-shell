@@ -7,6 +7,7 @@ import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.dataload.processes.ProcessService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -86,7 +87,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             if (type != null) {
                 process.setType(type);
             }
-            process = service.updateProcess(getCurrentProject(), process, source);
+            process = service.updateProcess(process, source);
         } else {
             if (name == null) {
                 name = removeExtension(source.getName());
@@ -113,6 +114,10 @@ public class ProcessCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "process execute", help = "Execute process")
     public String execute(@CliOption(key = {"", "uri"}, mandatory = true, help = "Process URI") final String processUri,
                           @CliOption(key = {"executable"}, help = "Executable") String executable,
+                          @CliOption(key = {"param"}, help = "Parameters (name and value seprated by '=')")
+                                  Pair<String, String>[] params,
+                          @CliOption(key = {"hidden"}, help = "Hidden parameters (name and value seprated by '=')")
+                                  Pair<String, String>[] hidden,
                           @CliOption(key = {"wait"}, help = "Wait for completion",
                                    unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean wait,
                           @CliOption(key = {"log"}, help = "Show execution log",
@@ -129,18 +134,20 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
         executable = pickSoleExecutable(process, executable);
 
-        final Map<String, String> params = new LinkedHashMap<>();
+        final Map<String, String> paramMap = createMap(params);
         if (scriptNextVersion) {
-            params.put("scriptNextVersion", "true");
+            paramMap.put("scriptNextVersion", "true");
         }
         if (cloverNextVersion) {
-            params.put("cloverNextVersion", "true");
+            paramMap.put("cloverNextVersion", "true");
         }
         if (newGraphExecution) {
-            params.put("newGraphExecution", "true");
+            paramMap.put("newGraphExecution", "true");
         }
 
-        final ProcessExecution execution = new ProcessExecution(process, executable, params);
+        final Map<String, String> hiddenMap = createMap(hidden);
+
+        final ProcessExecution execution = new ProcessExecution(process, executable, paramMap, hiddenMap);
         final FutureResult<ProcessExecutionDetail> futureResult = service.executeProcess(execution);
         if (wait || log) {
             System.out.println(futureResult.getPollingUri());
@@ -155,6 +162,16 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         } else {
             return futureResult.getPollingUri();
         }
+    }
+
+    private Map<String, String> createMap(Pair<String, String>[] params) {
+        final Map<String, String> paramMap = new LinkedHashMap<>();
+        if (params != null) {
+            for (Pair<String, String> param: params) {
+                paramMap.put(param.getKey(), param.getValue());
+            }
+        }
+        return paramMap;
     }
 
     static String pickSoleExecutable(final DataloadProcess process, final String executable) {
