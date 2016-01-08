@@ -9,10 +9,12 @@ import static java.util.Arrays.asList;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
 
+import com.gooddata.GoodDataRestException;
 import com.gooddata.gdc.FeatureFlag;
 import com.gooddata.project.ProjectFeatureFlag;
 import com.gooddata.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
@@ -62,13 +64,20 @@ public class FeatureCommand extends AbstractGoodDataCommand {
     public String setProject(@CliOption(key = {"flag"}, mandatory = true, help = "feature flag name") final String name,
             @CliOption(key = {"value"}, mandatory = true, help = "feature flag value") final boolean value) {
         final ProjectService projectService = getGoodData().getProjectService();
-        ProjectFeatureFlag flag = projectService.getFeatureFlag(getCurrentProject(), name);
-        if (flag != null) {
+        ProjectFeatureFlag flag;
+        try {
+            flag = projectService.getFeatureFlag(getCurrentProject(), name);
             flag.setEnabled(value);
             projectService.updateFeatureFlag(flag);
-        } else {
-            flag = projectService.createFeatureFlag(getCurrentProject(), new ProjectFeatureFlag(name, value));
+            return flag.getUri();
+        } catch (GoodDataRestException e) {
+            if (HttpStatus.NOT_FOUND.value() == e.getStatusCode()) {
+                flag = projectService.createFeatureFlag(getCurrentProject(), new ProjectFeatureFlag(name, value));
+            } else {
+                throw e;
+            }
         }
+
         return flag.getUri();
 
     }
