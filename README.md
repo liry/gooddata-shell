@@ -27,4 +27,3 @@ It is built on the [GoodData Java SDK](https://github.com/martiner/gooddata-java
 ### Update Driver
 1. `mvn -f driver/pom.xml clean package`
 1. commit new jar file
-```
