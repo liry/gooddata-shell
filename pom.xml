@@ -155,10 +155,14 @@
                 <configuration>
                     <failOnWarning>true</failOnWarning>
                     <ignoreNonCompile>true</ignoreNonCompile>
+                    <ignoredUnusedDeclaredDependencies>
+		        <ignoredUsedUndeclaredDependency>org.apache.thrift:libthrift</ignoredUsedUndeclaredDependency>
+		    </ignoredUnusedDeclaredDependencies>
                 </configuration>
                 <executions>
                     <execution>
                         <id>analyze</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>analyze-only</goal>
                         </goals>
