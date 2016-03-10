@@ -38,7 +38,7 @@ public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
         return print(collection, null, extractor);
     }
 
-    public <T> String print(Collection<T> collection, List<?> header, RowExtractor<T> extractor) {
+    public <T> String print(Iterable<T> collection, List<?> header, RowExtractor<T> extractor) {
         final Table table = new Table(header, collection, extractor);
         return print(table);
     }

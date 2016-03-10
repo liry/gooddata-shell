@@ -17,10 +17,10 @@ public class Table {
         this(null, items, formatter);
     }
 
-    public <T> Table(List<?> header, Collection<T> items, RowExtractor<T> formatter) {
+    public <T> Table(List<?> header, Iterable<T> items, RowExtractor<T> formatter) {
         notNull(formatter);
         notNull(items);
-        rows = new ArrayList<>(items.size());
+        rows = new ArrayList<>();
 
         this.header = header == null || header.isEmpty() ? Collections.<String>emptyList() : createRow(header);
 

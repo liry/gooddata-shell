@@ -6,13 +6,13 @@ package cz.geek.gooddata.shell.commands;
 
 import static java.util.Arrays.asList;
 
+import com.gooddata.featureflag.FeatureFlag;
+import com.gooddata.featureflag.FeatureFlagService;
+import com.gooddata.featureflag.ProjectFeatureFlag;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
 
 import com.gooddata.GoodDataRestException;
-import com.gooddata.gdc.FeatureFlag;
-import com.gooddata.project.ProjectFeatureFlag;
-import com.gooddata.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -40,22 +40,22 @@ public class FeatureCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "feature --project list", help = "List feature flags for project")
     public String listProject() {
-        final ProjectService projectService = getGoodData().getProjectService();
-        return print(projectService.listFeatureFlags(getCurrentProject()), asList("flag", "value"), new RowExtractor<ProjectFeatureFlag>() {
+        final FeatureFlagService service = getGoodData().getFeatureFlagService();
+        return print(service.listFeatureFlags(getCurrentProject()), asList("flag", "value"), new RowExtractor<FeatureFlag>() {
             @Override
-            public List<?> extract(ProjectFeatureFlag flag) {
-                return asList(flag.getName(), flag.getEnabled());
+            public List<?> extract(FeatureFlag flag) {
+                return asList(flag.getName(), flag.isEnabled());
             }
         });
     }
 
     @CliCommand(value = "feature list", help = "List all feature flags for project")
     public String listAll() {
-        final ProjectService projectService = getGoodData().getProjectService();
-        return print(projectService.listAggregatedFeatureFlags(getCurrentProject()), asList("flag", "value"), new RowExtractor<FeatureFlag>() {
+        final FeatureFlagService service = getGoodData().getFeatureFlagService();
+        return print(service.listFeatureFlags(getCurrentProject()), asList("flag", "value"), new RowExtractor<FeatureFlag>() {
             @Override
             public List<?> extract(FeatureFlag flag) {
-                return asList(flag.getName(), flag.getEnabled());
+                return asList(flag.getName(), flag.isEnabled());
             }
         });
     }
@@ -63,16 +63,16 @@ public class FeatureCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "feature --project set", help = "set feature flag for project")
     public String setProject(@CliOption(key = {"flag"}, mandatory = true, help = "feature flag name") final String name,
             @CliOption(key = {"value"}, mandatory = true, help = "feature flag value") final boolean value) {
-        final ProjectService projectService = getGoodData().getProjectService();
+        final FeatureFlagService service = getGoodData().getFeatureFlagService();
         ProjectFeatureFlag flag;
         try {
-            flag = projectService.getFeatureFlag(getCurrentProject(), name);
+            flag = service.getProjectFeatureFlag(getCurrentProject(), name);
             flag.setEnabled(value);
-            projectService.updateFeatureFlag(flag);
+            service.updateProjectFeatureFlag(flag);
             return flag.getUri();
         } catch (GoodDataRestException e) {
             if (HttpStatus.NOT_FOUND.value() == e.getStatusCode()) {
-                flag = projectService.createFeatureFlag(getCurrentProject(), new ProjectFeatureFlag(name, value));
+                flag = service.createProjectFeatureFlag(getCurrentProject(), new ProjectFeatureFlag(name, value));
             } else {
                 throw e;
             }
