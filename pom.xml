@@ -145,6 +145,9 @@
                 </executions>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
+                    <additionalClasspathElements>
+                        <element>${project.basedir}/driver/gooddata-jdbc-driver.jar</element>
+                    </additionalClasspathElements>
                 </configuration>
             </plugin>
             <plugin>
