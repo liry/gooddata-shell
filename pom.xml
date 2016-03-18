@@ -165,8 +165,9 @@
                     <failOnWarning>true</failOnWarning>
                     <ignoreNonCompile>true</ignoreNonCompile>
                     <ignoredUnusedDeclaredDependencies>
-		        <ignoredUsedUndeclaredDependency>org.apache.thrift:libthrift</ignoredUsedUndeclaredDependency>
-		    </ignoredUnusedDeclaredDependencies>
+                        <ignoredUsedUndeclaredDependency>org.apache.thrift:libthrift</ignoredUsedUndeclaredDependency>
+                        <ignoredUsedUndeclaredDependency>cz.geek:gooddata-shell-gooddata-jdbc-driver.jar</ignoredUsedUndeclaredDependency>
+                    </ignoredUnusedDeclaredDependencies>
                 </configuration>
                 <executions>
                     <execution>
@@ -178,6 +179,26 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.googlecode.addjars-maven-plugin</groupId>
+                <artifactId>addjars-maven-plugin</artifactId>
+                <version>1.0.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>add-jars</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/driver/</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
