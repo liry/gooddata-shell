@@ -3,6 +3,8 @@ package cz.geek.gooddata.shell.commands;
 import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectService;
+import com.gooddata.project.ProjectValidationResults;
+import com.gooddata.project.ProjectValidationType;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"project list", "project create", "project delete", "project use"})
+    @CliAvailabilityIndicator({"project list", "project create", "project delete", "project use", "project validate"})
     public boolean isAvailable() {
         return holder.hasGoodData();
     }
@@ -73,6 +75,13 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         final Project p = getProject(project);
         getGoodData().getProjectService().removeProject(p);
         return "Removed " + p.getUri();
+    }
+
+    @CliCommand(value = "project validate", help = "Validate GoodData project")
+    public String validate(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String project) {
+        final Project p = getProject(project);
+        final ProjectValidationResults results = getGoodData().getProjectService().validateProject(p, ProjectValidationType.PDM_VS_DWH, ProjectValidationType.INVALID_OBJECTS, ProjectValidationType.LDM, ProjectValidationType.METRIC_FILTER).get();
+        return "Valid: " + results.isValid();
     }
 
     private Project getProject(final String project) {
