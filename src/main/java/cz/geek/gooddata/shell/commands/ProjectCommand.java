@@ -2,6 +2,7 @@ package cz.geek.gooddata.shell.commands;
 
 import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
+import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
 import com.gooddata.project.ProjectValidationType;
@@ -45,12 +46,16 @@ public class ProjectCommand extends AbstractGoodDataCommand {
             @CliOption(key = {"title"}, mandatory = true, help = "Title") String title,
             @CliOption(key = {"token"}, mandatory = true, help = "Token") String token,
             @CliOption(key = {"template"}, help = "Title") String template,
-            @CliOption(key = "env", help = "Environment") Environment env
+            @CliOption(key = "env", help = "Environment") Environment env,
+            @CliOption(key = "driver", help = "Driver") ProjectDriver driver
     ) {
         final Project p = new Project(title, token);
         p.setProjectTemplate(template);
         if (env != null) {
             p.setEnvironment(env);
+        }
+        if (driver != null) {
+            p.setDriver(driver);
         }
         final Project project = getGoodData().getProjectService().createProject(p).get();
         holder.setCurrentProject(project);
