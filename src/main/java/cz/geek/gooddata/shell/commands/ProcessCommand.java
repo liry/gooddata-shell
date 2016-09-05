@@ -55,7 +55,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             @CliOption(key = {"uri", ""}, help = "Process URI of existing process to be updated") String processUri,
             @CliOption(key = {"name"}, help = "Process name") String name,
             @CliOption(key = {"type"}, help = "Process type") String type,
-            @CliOption(key = {"source"}, mandatory = true, help = "Process file or directory") File data) {
+            @CliOption(key = {"source"}, mandatory = true, help = "Process file or directory") File source) {
 
         final ProcessService service = getGoodData().getProcessService();
         DataloadProcess process;
@@ -67,9 +67,9 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             if (type != null) {
                 process.setType(type);
             }
-            process = service.updateProcess(getCurrentProject(), process, data);
+            process = service.updateProcess(getCurrentProject(), process, source);
         } else {
-            process = service.createProcess(getCurrentProject(), new DataloadProcess(name, type), data);
+            process = service.createProcess(getCurrentProject(), new DataloadProcess(name, type), source);
         }
 
         return "Uploaded process: " + process.getUri();
