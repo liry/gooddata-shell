@@ -26,9 +26,9 @@ public class LoginCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "login", help = "Login to GoodData platform")
     public String login(
             @CliOption(key = {"user"}, mandatory = true, help = "User name") String user,
-            @CliOption(key = {"pass"}, mandatory = false, help = "Password") String pass,
-            @CliOption(key = {"host"}, mandatory = false, help = "Host") String host,
-            @CliOption(key = {"project"}, mandatory = false, help = "Current project URI") String projectUri) throws IOException {
+            @CliOption(key = {"pass"}, help = "Password") String pass,
+            @CliOption(key = {"host"}, help = "Host") String host,
+            @CliOption(key = {"project"}, help = "Current project URI") String projectUri) throws IOException {
 
         if (StringUtils.isBlank(pass)) {
             final ConsoleReader cr = new ConsoleReader();

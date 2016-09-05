@@ -53,8 +53,8 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "connector execute", help = "Execute process")
     public String execute(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
-                          @CliOption(key = {"incremental"}, mandatory = false, help = "Incremental") final Boolean incremental,
-                          @CliOption(key = {"wait"}, mandatory = false, help = "Show execution log",
+                          @CliOption(key = {"incremental"}, help = "Incremental") final Boolean incremental,
+                          @CliOption(key = {"wait"}, help = "Show execution log",
                                   unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean wait) {
         final ConnectorService service = getGoodData().getConnectorService();
         final Zendesk4ProcessExecution execution = new Zendesk4ProcessExecution();
@@ -72,8 +72,8 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "connector update", help = "Update integration")
     public String update(@CliOption(key = {"connector"}, mandatory = true, help = "Connector type") final ConnectorType connector,
-            @CliOption(key = {"url"}, mandatory = false, help = "API URL") final String url,
-            @CliOption(key = {"active"}, mandatory = false, help = "Set integration active", specifiedDefaultValue = "true") final Boolean active) {
+            @CliOption(key = {"url"}, help = "API URL") final String url,
+            @CliOption(key = {"active"}, help = "Set integration active", specifiedDefaultValue = "true") final Boolean active) {
         final ConnectorService service = getGoodData().getConnectorService();
 
         if (url != null) {

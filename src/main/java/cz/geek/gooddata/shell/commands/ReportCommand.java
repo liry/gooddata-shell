@@ -39,8 +39,8 @@ public class ReportCommand extends AbstractGoodDataCommand {
 
 
     @CliCommand(value = "report export", help = "Export report")
-    public String report(@CliOption(key = {"uri", ""}, mandatory = false, help = "Report URI") String reportUri,
-                         @CliOption(key = {"definition"}, mandatory = false, help = "Report definition URI") String definitionUri
+    public String report(@CliOption(key = {"uri", ""}, help = "Report URI") String reportUri,
+                         @CliOption(key = {"definition"}, help = "Report definition URI") String definitionUri
                         ) throws IOException {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -73,7 +73,7 @@ public class ReportCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "report list", help = "List reports")
-    public String list(@CliOption(key = {"definition"}, mandatory = false, help = "List definitions",
+    public String list(@CliOption(key = {"definition"}, help = "List definitions",
             unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean definition) {
         return printEntries(getGoodData().getMetadataService().find(getCurrentProject(), definition ? ReportDefinition.class : Report.class));
     }

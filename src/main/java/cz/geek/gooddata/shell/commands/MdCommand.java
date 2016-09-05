@@ -48,10 +48,10 @@ public class MdCommand extends AbstractGoodDataCommand {
 
 
     @CliCommand(value = "md", help = "Query metadata")
-    public String md(@CliOption(key = {"type"}, mandatory = false, help = "type") MdType type,
-                     @CliOption(key = {"id"}, mandatory = false, help = "identifier") String id,
-                     @CliOption(key = {"title"}, mandatory = false, help = "title") String title,
-                     @CliOption(key = {"summary"}, mandatory = false, help = "summary") String summary
+    public String md(@CliOption(key = {"type"}, help = "type") MdType type,
+                     @CliOption(key = {"id"}, help = "identifier") String id,
+                     @CliOption(key = {"title"}, help = "title") String title,
+                     @CliOption(key = {"summary"}, help = "summary") String summary
                      ) {
         final List<Restriction> restrictions = new ArrayList<>();
         if (StringUtils.hasText(id)) {

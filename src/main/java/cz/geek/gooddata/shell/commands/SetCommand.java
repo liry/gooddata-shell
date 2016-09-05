@@ -22,7 +22,7 @@ public class SetCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "set output", help = "Set runtime options")
-    public String setOutput(@CliOption(key = {"", "format"}, mandatory = false, help = "Get or set output format") OutputFormatter formatter) {
+    public String setOutput(@CliOption(key = {"", "format"}, help = "Get or set output format") OutputFormatter formatter) {
         if (formatter != null) {
             holder.setOutputFormatter(formatter);
         }
@@ -30,7 +30,7 @@ public class SetCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "set exception", help = "Set exception logging / show the last exception")
-    public String setException(@CliOption(key = {"", "format"}, mandatory = false, help = "Get or set exception") ExceptionFormat format) {
+    public String setException(@CliOption(key = {"", "format"}, help = "Get or set exception") ExceptionFormat format) {
         if (format != null) {
             switch (format) {
                 case message:

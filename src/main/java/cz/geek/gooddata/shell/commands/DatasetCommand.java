@@ -45,8 +45,8 @@ public class DatasetCommand extends AbstractGoodDataCommand {
     public String load(
             @CliOption(key = {"dataset", ""}, mandatory = true, help = "Dataset id") String dataset,
             @CliOption(key = {"csv"}, mandatory = true, help = "CSV file") File csv,
-            @CliOption(key = {"mode"}, mandatory = false, help = "Upload mode") UploadMode mode,
-            @CliOption(key = {"populates"}, mandatory = false, help = "TODO") String populates
+            @CliOption(key = {"mode"}, help = "Upload mode") UploadMode mode,
+            @CliOption(key = {"populates"}, help = "TODO") String populates
     ) throws IOException {
 
         if (mode == null) {

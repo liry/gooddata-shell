@@ -34,7 +34,7 @@ public class StorageCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "storage upload", help = "Upload file to the user staging area (WebDAV)")
     public String upload(
             @CliOption(key = {"src", ""}, mandatory = true, help = "Source file on local disk") File src,
-            @CliOption(key = {"dst"}, mandatory = false, help = "Destination file name") String dst) throws FileNotFoundException {
+            @CliOption(key = {"dst"}, help = "Destination file name") String dst) throws FileNotFoundException {
 
         final String name = dst != null ? dst : src.getName();
         getGoodData().getDataStoreService().upload(name, new FileInputStream(src));
@@ -44,7 +44,7 @@ public class StorageCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "storage download", help = "Download file from the user staging area (WebDAV)")
     public String download(
             @CliOption(key = {"src", ""}, mandatory = true, help = "Source file on staging area") String src,
-            @CliOption(key = {"dst"}, mandatory = false, help = "Destination file name") File dst) throws IOException {
+            @CliOption(key = {"dst"}, help = "Destination file name") File dst) throws IOException {
 
         final File name = dst != null ? dst : new File(src);
         final InputStream stream = getGoodData().getDataStoreService().download(src);

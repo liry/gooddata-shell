@@ -63,7 +63,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "project use", help = "Get or set current GoodData project")
-    public String project(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String project) {
+    public String project(@CliOption(key = {""}, help = "Project id or uri") String project) {
         if (project !=  null) {
             final Project p = getProject(project);
             holder.setCurrentProject(p);
@@ -76,14 +76,14 @@ public class ProjectCommand extends AbstractGoodDataCommand {
     }
 
     @CliCommand(value = "project delete", help = "Delete GoodData project")
-    public String delete(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String project) {
+    public String delete(@CliOption(key = {""}, help = "Project id or uri") String project) {
         final Project p = getProject(project);
         getGoodData().getProjectService().removeProject(p);
         return "Removed " + p.getUri();
     }
 
     @CliCommand(value = "project validate", help = "Validate GoodData project")
-    public String validate(@CliOption(key = {""}, mandatory = false, help = "Project id or uri") String project) {
+    public String validate(@CliOption(key = {""}, help = "Project id or uri") String project) {
         final Project p = getProject(project);
         final ProjectValidationResults results = getGoodData().getProjectService().validateProject(p, ProjectValidationType.PDM_VS_DWH, ProjectValidationType.INVALID_OBJECTS, ProjectValidationType.LDM, ProjectValidationType.METRIC_FILTER).get();
         return "Valid: " + results.isValid();
