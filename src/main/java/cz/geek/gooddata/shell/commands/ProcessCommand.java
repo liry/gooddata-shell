@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -69,6 +70,9 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             }
             process = service.updateProcess(getCurrentProject(), process, source);
         } else {
+            if (name == null) {
+                name = removeExtension(source.getName());
+            }
             process = service.createProcess(getCurrentProject(), new DataloadProcess(name, type), source);
         }
 
