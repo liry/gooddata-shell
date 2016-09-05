@@ -17,7 +17,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -98,7 +100,14 @@ public class ProcessCommand extends AbstractGoodDataCommand {
                           @CliOption(key = {"wait"}, help = "Wait for completion",
                                    unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean wait,
                           @CliOption(key = {"log"}, help = "Show execution log",
-                                  unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean log) {
+                                  unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean log,
+                          @CliOption(key = "scriptNextVersion", help = "Use 'next version' environment for scripts",
+                                  unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean scriptNextVersion,
+                          @CliOption(key = "cloverNextVersion", help = "Use 'next version' environment for graphs",
+                                  unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean cloverNextVersion,
+                          @CliOption(key = "newGraphExecution", help = "Run graph on scripts environment",
+                                  unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean newGraphExecution
+                          ) {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
 
@@ -111,7 +120,19 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             }
         }
 
-        final FutureResult<ProcessExecutionDetail> futureResult = service.executeProcess(new ProcessExecution(process, executable));
+        final Map<String, String> params = new LinkedHashMap<>();
+        if (scriptNextVersion) {
+            params.put("scriptNextVersion", "true");
+        }
+        if (cloverNextVersion) {
+            params.put("cloverNextVersion", "true");
+        }
+        if (newGraphExecution) {
+            params.put("newGraphExecution", "true");
+        }
+
+        final ProcessExecution execution = new ProcessExecution(process, executable, params);
+        final FutureResult<ProcessExecutionDetail> futureResult = service.executeProcess(execution);
         if (wait || log) {
             System.out.println(futureResult.getPollingUri());
             final ProcessExecutionDetail detail = futureResult.get();
