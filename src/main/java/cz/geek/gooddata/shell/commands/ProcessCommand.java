@@ -111,14 +111,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
 
-        if (isEmpty(executable)) {
-            final Set<String> executables = process.getExecutables();
-            if (executables.size() == 1) {
-                executable = executables.iterator().next();
-            } else {
-                throw new IllegalArgumentException("Need to specify 'executable' option with value of " + executables);
-            }
-        }
+        executable = pickSoleExecutable(process, executable);
 
         final Map<String, String> params = new LinkedHashMap<>();
         if (scriptNextVersion) {
@@ -146,6 +139,18 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         } else {
             return futureResult.getPollingUri();
         }
+    }
+
+    static String pickSoleExecutable(final DataloadProcess process, final String executable) {
+        if (isEmpty(executable)) {
+            final Set<String> executables = process.getExecutables();
+            if (executables.size() == 1) {
+                return executables.iterator().next();
+            } else {
+                throw new IllegalArgumentException("Need to specify 'executable' option with value of " + executables);
+            }
+        }
+        return executable;
     }
 
 }
