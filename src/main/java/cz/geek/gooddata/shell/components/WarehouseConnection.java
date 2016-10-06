@@ -19,7 +19,7 @@ public class WarehouseConnection {
         notNull(credentials, "credentials");
         this.warehouse = notNull(warehouse, "warehouse");
 
-        final String con = warehouse.getJdbcConnectionString();
+        final String con = warehouse.getConnectionUrl();
         this.dataSource = new DriverManagerDataSource(con, credentials.getUser(), credentials.getPass());
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

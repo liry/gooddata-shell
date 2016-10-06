@@ -1,8 +1,8 @@
 package cz.geek.gooddata.shell.commands;
 
-import com.gooddata.dataset.Dataset;
 import com.gooddata.dataset.DatasetManifest;
 import com.gooddata.dataset.DatasetService;
+import com.gooddata.gdc.AboutLinks.Link;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,11 +107,11 @@ public class DatasetCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "dataset list", help = "List datasets")
     public String list() {
-        return print(getGoodData().getDatasetService().listDatasets(getCurrentProject()),
-                asList("URI", "Identifier", "Title"), new RowExtractor<Dataset>() {
+        return print(getGoodData().getDatasetService().listDatasetLinks(getCurrentProject()),
+                asList("URI", "Identifier", "Title"), new RowExtractor<Link>() {
             @Override
-            public List<?> extract(Dataset dataset) {
-                return asList(dataset.getLink(), dataset.getIdentifier(), dataset.getTitle());
+            public List<?> extract(Link dataset) {
+                return asList(dataset.getUri(), dataset.getIdentifier(), dataset.getTitle());
             }
         });
     }

@@ -43,7 +43,7 @@ public class AdsCommand extends AbstractGoodDataCommand {
         return print(getGoodData().getWarehouseService().listWarehouses(), asList("JDBC URI", "Title"), new RowExtractor<Warehouse>() {
             @Override
             public List<?> extract(final Warehouse warehouse) {
-                return asList(warehouse.getJdbcConnectionString(), warehouse.getTitle());
+                return asList(warehouse.getConnectionUrl(), warehouse.getTitle());
             }
         });
     }

@@ -58,7 +58,7 @@ public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
         return print(entries, asList("URI", "Identifier", "Title"), new RowExtractor<Entry>() {
             @Override
             public List<?> extract(Entry entry) {
-                return asList(entry.getLink(), entry.getIdentifier(), entry.getTitle());
+                return asList(entry.getUri(), entry.getIdentifier(), entry.getTitle());
             }
         });
     }
