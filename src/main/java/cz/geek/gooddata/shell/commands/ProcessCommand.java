@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +42,25 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         return holder.hasCurrentProject();
     }
 
+    @CliAvailabilityIndicator("process listuser")
+    public boolean isAvailableListUser() {
+        return holder.hasGoodData();
+    }
+
     @CliCommand(value = "process list", help = "List processes")
     public String list() {
-        return print(getGoodData().getProcessService().listProcesses(getCurrentProject()), asList("URI", "Name", "Executables"),
+        final Collection<DataloadProcess> processes = getGoodData().getProcessService().listProcesses(getCurrentProject());
+        return list(processes);
+    }
+
+    @CliCommand(value = "process listuser", help = "List all user's processes")
+    public String listUser() {
+        final Collection<DataloadProcess> processes = getGoodData().getProcessService().listUserProcesses();
+        return list(processes);
+    }
+
+    private String list(final Collection<DataloadProcess> processes) {
+        return print(processes, asList("URI", "Name", "Executables"),
                 new RowExtractor<DataloadProcess>() {
             @Override
             public List<?> extract(DataloadProcess process) {
@@ -51,7 +68,6 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             }
         });
     }
-
 
     @CliCommand(value = "process upload", help = "Create or update process")
     public String load(
