@@ -12,9 +12,8 @@ public class RestService extends AbstractService {
         super(restTemplate);
     }
 
-    public String get(final String uri) {
+    public <T> ResponseEntity<T> get(final String uri, Class<T> cls) {
         notNull(uri, "uri");
-        final ResponseEntity<String> entity = restTemplate.getForEntity(uri, String.class);
-        return entity.getBody() != null ? entity.getBody() : "Status: " + entity.getStatusCode();
+        return restTemplate.getForEntity(uri, cls);
     }
 }
