@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.gooddata.dataload.processes.ProcessType.DATALOAD;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -38,7 +39,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"process upload", "process download", "process list", "process execute"})
+    @CliAvailabilityIndicator({"process upload", "process download", "process list", "process execute", "process executions"})
     public boolean isAvailable() {
         return holder.hasCurrentProject();
     }
@@ -52,6 +53,20 @@ public class ProcessCommand extends AbstractGoodDataCommand {
     public String list() {
         final Collection<DataloadProcess> processes = getGoodData().getProcessService().listProcesses(getCurrentProject());
         return list(processes);
+    }
+
+    @CliCommand(value = "process executions", help = "List process executions")
+    public String executions(@CliOption(key = {"uri", ""}, help = "Process URI") String processUri) {
+        final ProcessService service = getGoodData().getProcessService();
+        final DataloadProcess process = service.getProcessByUri(processUri);
+        final List<ProcessExecutionDetail> processes = service.listExecutions(process);
+        return print(processes, asList("URI", "Status"),
+                new RowExtractor<ProcessExecutionDetail>() {
+                    @Override
+                    public List<?> extract(ProcessExecutionDetail process) {
+                        return asList(process.getUri(), process.getStatus());
+                    }
+                });
     }
 
     @CliCommand(value = "process listuser", help = "List all user's processes")
@@ -132,9 +147,14 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         final ProcessService service = getGoodData().getProcessService();
         final DataloadProcess process = service.getProcessByUri(processUri);
 
-        executable = pickSoleExecutable(process, executable);
-
         final Map<String, String> paramMap = createMap(params);
+
+        if (DATALOAD.name().equals(process.getType())) {
+            paramMap.put("GDC_DE_SYNCHRONIZE_ALL", "true");
+        } else {
+            executable = pickSoleExecutable(process, executable);
+        }
+
         if (scriptNextVersion) {
             paramMap.put("scriptNextVersion", "true");
         }
@@ -146,22 +166,35 @@ public class ProcessCommand extends AbstractGoodDataCommand {
         }
 
         final Map<String, String> hiddenMap = createMap(hidden);
-
+//new ProcessExecution(process, null, Collections.singletonMap("GDC_DE_SYNCHRONIZE_ALL", "true"));
         final ProcessExecution execution = new ProcessExecution(process, executable, paramMap, hiddenMap);
         final FutureResult<ProcessExecutionDetail> futureResult = service.executeProcess(execution);
         if (wait || log) {
             System.out.println(futureResult.getPollingUri());
-            final ProcessExecutionDetail detail = futureResult.get();
-            String result = "Executed process " + detail.getUri() + ": " + detail.getStatus();
-            if (log) {
-                final ByteArrayOutputStream out = new ByteArrayOutputStream();
-                service.getExecutionLog(detail, out);
-                result += "\n" + out.toString();
-            }
-            return result;
+            return getProcessExecution(service, futureResult, log);
         } else {
             return futureResult.getPollingUri();
         }
+    }
+
+    private static String getProcessExecution(final ProcessService service, final FutureResult<ProcessExecutionDetail> futureResult, final boolean log) {
+        final ProcessExecutionDetail detail = futureResult.get();
+        String result = "Executed process " + detail.getUri() + ": " + detail.getStatus();
+        if (log) {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            service.getExecutionLog(detail, out);
+            result += "\n" + out.toString();
+        }
+        return result;
+    }
+
+    @CliCommand(value = "process execution", help = "Wait for process to finish")
+    public String execution(@CliOption(key = {"", "uri"}, mandatory = true, help = "Process URI") final String detailUri,
+                            @CliOption(key = {"log"}, help = "Show execution log",
+                                    unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean log) {
+        final ProcessService service = getGoodData().getProcessService();
+        final FutureResult<ProcessExecutionDetail> detail = service.getExecutionDetailByUri(detailUri);
+        return getProcessExecution(service, detail, log);
     }
 
     private Map<String, String> createMap(Pair<String, String>[] params) {
