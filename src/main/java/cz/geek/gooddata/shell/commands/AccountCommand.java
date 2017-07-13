@@ -62,9 +62,4 @@ public class AccountCommand extends AbstractGoodDataCommand {
         });
     }
 
-    private Account getAccount(final String account) {
-        final AccountService service = getGoodData().getAccountService();
-        return Account.TEMPLATE.matches(account) ? service.getAccountByUri(account) : service.getAccountById(account);
-    }
-
 }

@@ -1,5 +1,7 @@
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.account.Account;
+import com.gooddata.account.AccountService;
 import com.gooddata.md.Entry;
 import com.gooddata.project.Project;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
@@ -78,5 +80,10 @@ public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
         if (holder.isPrintStackTrace()) {
             thrown.printStackTrace();
         }
+    }
+
+    protected Account getAccount(final String account) {
+        final AccountService service = getGoodData().getAccountService();
+        return Account.TEMPLATE.matches(account) ? service.getAccountByUri(account) : service.getAccountById(account);
     }
 }

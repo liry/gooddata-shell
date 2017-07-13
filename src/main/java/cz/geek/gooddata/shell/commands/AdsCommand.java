@@ -3,10 +3,16 @@
  */
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.account.Account;
+import com.gooddata.collections.PageRequest;
+import com.gooddata.collections.PageableList;
 import com.gooddata.project.Environment;
 import com.gooddata.warehouse.Warehouse;
 import com.gooddata.warehouse.WarehouseService;
+import com.gooddata.warehouse.WarehouseUser;
+import com.gooddata.warehouse.WarehouseUserRole;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
+import cz.geek.gooddata.shell.components.WarehouseConnection;
 import cz.geek.gooddata.shell.output.RowExtractor;
 import cz.geek.gooddata.shell.output.Table;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +39,14 @@ public class AdsCommand extends AbstractGoodDataCommand {
         return holder.hasGoodData();
     }
 
-    @CliAvailabilityIndicator({"ads query", "ads execute"})
+    @CliAvailabilityIndicator({"ads query", "ads execute", "ads users", "ads useradd", "ads userdel"})
     public boolean isJdbcAvailable() {
         return holder.hasCurrentWarehouse();
     }
 
     @CliCommand(value = "ads list", help = "List ADS instances")
     public String list() {
-        return print(getGoodData().getWarehouseService().listWarehouses(), asList("JDBC URI", "Title"), new RowExtractor<Warehouse>() {
+        return print(getWarehouseService().listWarehouses(), asList("JDBC URI", "Title"), new RowExtractor<Warehouse>() {
             @Override
             public List<?> extract(final Warehouse warehouse) {
                 return asList(warehouse.getConnectionUrl(), warehouse.getTitle());
@@ -58,15 +64,15 @@ public class AdsCommand extends AbstractGoodDataCommand {
         if (env != null) {
             warehouse.setEnvironment(env);
         }
-        return "Created ADS instance: " + getGoodData().getWarehouseService().createWarehouse(warehouse).get().getUri();
+        return "Created ADS instance: " + getWarehouseService().createWarehouse(warehouse).get().getUri();
     }
 
     @CliCommand(value = "ads delete", help = "Delete ADS instances")
-    public String delete(@CliOption(key = "id", mandatory = true, help = "instance id") String id) {
-        final WarehouseService service = getGoodData().getWarehouseService();
-        final Warehouse warehouse = service.getWarehouseById(id);
+    public String delete(@CliOption(key = {""}, mandatory = true, help = "Warehouse id, uri or jdbc connection string") String name) {
+        final WarehouseService service = getWarehouseService();
+        final Warehouse warehouse = getWarehouse(name);
         service.removeWarehouse(warehouse);
-        return "Deleted ADS instance: " + id;
+        return "Deleted ADS instance: " + warehouse.getId();
     }
 
     @CliCommand(value = "ads use", help = "Use ADS instances")
@@ -78,17 +84,63 @@ public class AdsCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "ads query", help = "Query (select)")
     public String query(@CliOption(key = {"", "sql"}, mandatory = true, help = "SQL query returning a result set") String sql) {
-        final Table table = holder.getCurrentWarehouse().getJdbcTemplate().query(sql, TABLE_RESULT_SET_EXTRACTOR);
+        final Table table = getCurrentWarehouseConnection().getJdbcTemplate().query(sql, TABLE_RESULT_SET_EXTRACTOR);
         return print(table);
     }
 
     @CliCommand(value = "ads execute", help = "Execute (create, insert, update, delete,...)")
     public void execute(@CliOption(key = {"", "sql"}, mandatory = true, help = "SQL command without result") String sql) {
-        holder.getCurrentWarehouse().getJdbcTemplate().execute(sql);
+        getCurrentWarehouseConnection().getJdbcTemplate().execute(sql);
+    }
+
+    @CliCommand(value = "ads users", help = "List ADS users")
+    public String users() {
+        final Warehouse warehouse = getCurrentWarehouseConnection().getWarehouse();
+        final PageableList<WarehouseUser> users = getWarehouseService().listWarehouseUsers(warehouse, new PageRequest());
+        return print(users, asList("Id", "Role"), new RowExtractor<WarehouseUser>() {
+            @Override
+            public List<?> extract(final WarehouseUser user) {
+                return asList(user.getUri(), user.getRole());
+            }
+        });
+    }
+
+    @CliCommand(value = "ads useradd", help = "Add user to ADS")
+    public String addUser(@CliOption(key = "account", mandatory = true, help = "Account id or uri") String name,
+                          @CliOption(key = "role", mandatory = true, help = "Role") WarehouseUserRole role) {
+        final Account account = getAccount(name);
+        final WarehouseUser user = WarehouseUser.createWithlogin(account.getLogin(), role);
+        getWarehouseService().addUserToWarehouse(getCurrentWarehouseConnection().getWarehouse(), user);
+        return "Added";
+    }
+
+    @CliCommand(value = "ads userdel", help = "Remove user from ADS")
+    public String delUser(@CliOption(key = {"", "account"}, mandatory = true, help = "Account id or uri") String name) {
+        final Account account = getAccount(name);
+        final WarehouseUser user = findUser(account);
+        getWarehouseService().removeUserFromWarehouse(user);
+        return "Removed";
+    }
+
+    private WarehouseUser findUser(final Account account) {
+        final PageableList<WarehouseUser> users = getWarehouseService().listWarehouseUsers(getCurrentWarehouseConnection().getWarehouse(), new PageRequest());
+        for (WarehouseUser user: users) {
+            if (user.getProfile().equals(account.getUri())) {
+                return user;
+            }
+        }
+        throw new IllegalArgumentException("User not found");
+    }
+    private WarehouseService getWarehouseService() {
+        return getGoodData().getWarehouseService();
+    }
+
+    private WarehouseConnection getCurrentWarehouseConnection() {
+        return holder.getCurrentWarehouseConnection();
     }
 
     private Warehouse getWarehouse(final String warehouse) {
-        final WarehouseService service = getGoodData().getWarehouseService();
+        final WarehouseService service = getWarehouseService();
         if (Warehouse.TEMPLATE.matches(warehouse)) {
             return service.getWarehouseByUri(warehouse);
         } else if (Warehouse.JDBC_CONNECTION_TEMPLATE.matches(warehouse)) {

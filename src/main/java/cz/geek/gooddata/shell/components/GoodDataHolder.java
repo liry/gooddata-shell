@@ -65,7 +65,7 @@ public class GoodDataHolder {
         this.connection = new WarehouseConnection(warehouse, getCredentials());
     }
 
-    public WarehouseConnection getCurrentWarehouse() {
+    public WarehouseConnection getCurrentWarehouseConnection() {
         return connection;
     }
 

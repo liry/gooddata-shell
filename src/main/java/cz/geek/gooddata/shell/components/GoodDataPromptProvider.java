@@ -28,7 +28,7 @@ public class GoodDataPromptProvider implements PromptProvider {
             builder.append(":").append(holder.getCurrentProject().getId());
         }
         if (holder.hasCurrentWarehouse()) {
-            builder.append(":").append(holder.getCurrentWarehouse().getWarehouse().getId());
+            builder.append(":").append(holder.getCurrentWarehouseConnection().getWarehouse().getId());
         }
         builder.append("> ");
         return builder.toString();
