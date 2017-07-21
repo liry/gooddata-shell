@@ -3,7 +3,6 @@ package cz.geek.gooddata.shell.commands;
 import com.gooddata.account.Account;
 import com.gooddata.account.AccountService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.components.Utils;
 import cz.geek.gooddata.shell.output.RowExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
