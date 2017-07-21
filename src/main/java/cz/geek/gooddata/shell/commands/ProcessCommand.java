@@ -75,10 +75,12 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             @CliOption(key = {"uri", ""}, help = "Process URI of existing process to be updated") String processUri,
             @CliOption(key = {"name"}, help = "Process name") String name,
             @CliOption(key = {"type"}, help = "Process type") String type,
-            @CliOption(key = {"source"}, mandatory = true, help = "Process file or directory") File source) {
+            @CliOption(key = {"appstore"}, help = "Appstore path") String appstore,
+            @CliOption(key = {"source"}, help = "Process file or directory") File source) {
 
         final ProcessService service = getGoodData().getProcessService();
-        DataloadProcess process;
+        DataloadProcess process = null;
+
         if (processUri != null) {
             process = service.getProcessByUri(processUri);
             if (name != null) {
@@ -87,12 +89,26 @@ public class ProcessCommand extends AbstractGoodDataCommand {
             if (type != null) {
                 process.setType(type);
             }
-            process = service.updateProcess(process, source);
-        } else {
-            if (name == null) {
-                name = removeExtension(source.getName());
+        }
+
+        if (source != null) {
+            if (processUri != null) {
+                process = service.updateProcess(process, source);
+            } else {
+                if (name == null) {
+                    name = removeExtension(source.getName());
+                }
+                process = service.createProcess(getCurrentProject(), new DataloadProcess(name, type), source);
             }
-            process = service.createProcess(getCurrentProject(), new DataloadProcess(name, type), source);
+        } else if (appstore != null) {
+            if (processUri != null) {
+                process.setPath(appstore);
+                process = service.updateProcessFromAppstore(process).get();
+            } else {
+                process = service.createProcessFromAppstore(getCurrentProject(), new DataloadProcess(name, type, appstore)).get();
+            }
+        } else {
+            throw new IllegalArgumentException("Missing argument: appstore or source has to be specified");
         }
 
         return "Uploaded process: " + process.getUri();
