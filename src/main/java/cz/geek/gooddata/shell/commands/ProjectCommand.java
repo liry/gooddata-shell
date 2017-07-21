@@ -1,6 +1,8 @@
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.project.CreatedInvitations;
 import com.gooddata.project.Environment;
+import com.gooddata.project.Invitation;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectService;
@@ -8,12 +10,14 @@ import com.gooddata.project.ProjectValidationResults;
 import com.gooddata.project.ProjectValidationType;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.output.RowExtractor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -31,9 +35,14 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         return holder.hasGoodData();
     }
 
+    @CliAvailabilityIndicator({"project invite"})
+    public boolean isAvailableWithProject() {
+        return holder.hasCurrentProject();
+    }
+
     @CliCommand(value = "project list", help = "List GoodData projects")
     public String list() {
-        return print(getGoodData().getProjectService().getProjects(), asList("URI", "Title"), new RowExtractor<Project>() {
+        return print(getProjectService().getProjects(), asList("URI", "Title"), new RowExtractor<Project>() {
             @Override
             public List<?> extract(Project project) {
                 return asList(project.getUri(), project.getTitle());
@@ -57,7 +66,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         if (driver != null) {
             p.setDriver(driver);
         }
-        final Project project = getGoodData().getProjectService().createProject(p).get();
+        final Project project = getProjectService().createProject(p).get();
         holder.setCurrentProject(project);
         return "Created project: " + project.getUri();
     }
@@ -78,20 +87,42 @@ public class ProjectCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "project delete", help = "Delete GoodData project")
     public String delete(@CliOption(key = {""}, help = "Project id or uri") String project) {
         final Project p = getProject(project);
-        getGoodData().getProjectService().removeProject(p);
+        getProjectService().removeProject(p);
         return "Removed " + p.getUri();
     }
 
     @CliCommand(value = "project validate", help = "Validate GoodData project")
     public String validate(@CliOption(key = {""}, help = "Project id or uri") String project) {
         final Project p = getProject(project);
-        final ProjectValidationResults results = getGoodData().getProjectService().validateProject(p, ProjectValidationType.PDM_VS_DWH, ProjectValidationType.INVALID_OBJECTS, ProjectValidationType.LDM, ProjectValidationType.METRIC_FILTER).get();
+        final ProjectValidationResults results = getProjectService().validateProject(p, ProjectValidationType.PDM_VS_DWH, ProjectValidationType.INVALID_OBJECTS, ProjectValidationType.LDM, ProjectValidationType.METRIC_FILTER).get();
         return "Valid: " + results.isValid();
     }
 
+    @CliCommand(value = "project invite", help = "Invite user to GoodData project")
+    public String invite(@CliOption(key = {""}, mandatory = true, help = "Email address") String email) {
+        final CreatedInvitations created = getProjectService().sendInvitations(holder.getCurrentProject(), new Invitation(email));
+        final List<String> result = new ArrayList<>();
+        result.addAll(invitationResult("Invitations: ", created.getInvitationUris()));
+        result.addAll(invitationResult("Already in project: ", created.getAlreadyInProjectEmails()));
+        result.addAll(invitationResult("Domain mismatch: ", created.getDomainMismatchEmails()));
+        return StringUtils.join(result, ", ");
+    }
+
+    private ProjectService getProjectService() {
+        return getGoodData().getProjectService();
+    }
+
     private Project getProject(final String project) {
-        final ProjectService service = getGoodData().getProjectService();
+        final ProjectService service = getProjectService();
         return Project.TEMPLATE.matches(project) ? service.getProjectByUri(project) : service.getProjectById(project);
+    }
+
+    private static List<String> invitationResult(final String item, final List<String> list) {
+        final List<String> result = new ArrayList<>();
+        if (!list.isEmpty()) {
+            result.add(item + StringUtils.join(list, " "));
+        }
+        return result;
     }
 
 }
