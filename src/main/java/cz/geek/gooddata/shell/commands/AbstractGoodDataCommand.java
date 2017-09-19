@@ -14,7 +14,6 @@ import org.springframework.shell.event.ParseResult;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.gooddata.util.Validate.notNull;
@@ -51,18 +50,9 @@ public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
 
     protected String printEntries(Collection<Entry> list) {
         final ArrayList<Entry> entries = new ArrayList<>(list);
-        Collections.sort(entries, new Comparator<Entry>() {
-            @Override
-            public int compare(final Entry o1, final Entry o2) {
-                return o1.getIdentifier().compareToIgnoreCase(o2.getIdentifier());
-            }
-        });
-        return print(entries, asList("URI", "Identifier", "Title"), new RowExtractor<Entry>() {
-            @Override
-            public List<?> extract(Entry entry) {
-                return asList(entry.getUri(), entry.getIdentifier(), entry.getTitle());
-            }
-        });
+        Collections.sort(entries, (o1, o2) -> o1.getIdentifier().compareToIgnoreCase(o2.getIdentifier()));
+        return print(entries, asList("URI", "Identifier", "Title"),
+                entry -> asList(entry.getUri(), entry.getIdentifier(), entry.getTitle()));
     }
 
     @Override

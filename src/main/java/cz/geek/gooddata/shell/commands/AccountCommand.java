@@ -3,7 +3,6 @@ package cz.geek.gooddata.shell.commands;
 import com.gooddata.account.Account;
 import com.gooddata.account.AccountService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -79,12 +78,8 @@ public class AccountCommand extends AbstractGoodDataCommand {
     }
 
     private String print(final List<Account> accounts) {
-        return print(accounts, asList("uri", "login", "first name", "last name"), new RowExtractor<Account>() {
-            @Override
-            public List<?> extract(final Account account) {
-                return asList(account.getUri(), account.getLogin(), account.getFirstName(), account.getLastName());
-            }
-        });
+        return print(accounts, asList("uri", "login", "first name", "last name"),
+                account -> asList(account.getUri(), account.getLogin(), account.getFirstName(), account.getLastName()));
     }
 
     private AccountService getAccountService() {

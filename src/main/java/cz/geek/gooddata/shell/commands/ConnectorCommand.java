@@ -1,8 +1,5 @@
 package cz.geek.gooddata.shell.commands;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-
 import com.gooddata.FutureResult;
 import com.gooddata.connector.ConnectorService;
 import com.gooddata.connector.ConnectorType;
@@ -12,11 +9,7 @@ import com.gooddata.connector.ProcessStatus;
 import com.gooddata.connector.Settings;
 import com.gooddata.connector.Zendesk4ProcessExecution;
 import com.gooddata.connector.Zendesk4Settings;
-import com.google.common.collect.ImmutableMap;
-
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -24,8 +17,9 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  */
@@ -104,14 +98,11 @@ public class ConnectorCommand extends AbstractGoodDataCommand {
         return print(
                 processes.entrySet(),
                 asList("type", "status", "start", "end"),
-                new RowExtractor<Map.Entry<String, IntegrationProcessStatus>>() {
-                    @Override
-                    public List<?> extract(Map.Entry<String, IntegrationProcessStatus> entry) {
-                        final IntegrationProcessStatus process = entry.getValue();
-                        return process == null
-                                ? asList(entry.getKey(), "-", "-", "-")
-                                : asList(entry.getKey(), process.getStatus().getCode(), process.getStarted(), process.getFinished());
-                    }
+                entry -> {
+                    final IntegrationProcessStatus process = entry.getValue();
+                    return process == null
+                            ? asList(entry.getKey(), "-", "-", "-")
+                            : asList(entry.getKey(), process.getStatus().getCode(), process.getStarted(), process.getFinished());
                 });
     }
 

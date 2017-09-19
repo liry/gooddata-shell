@@ -5,14 +5,11 @@ import com.gooddata.dataload.processes.ProcessService;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.dataload.processes.ScheduleState;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 import static cz.geek.gooddata.shell.commands.ProcessCommand.pickSoleExecutable;
 import static java.util.Arrays.asList;
@@ -34,14 +31,9 @@ public class ScheduleCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "schedule list", help = "List schedules")
     public String list() {
-        // todo paging
-        return print(getGoodData().getProcessService().listSchedules(getCurrentProject()), asList("URI", "State", "Cron", "Process ID", "Executables"),
-                new RowExtractor<Schedule>() {
-            @Override
-            public List<?> extract(Schedule schedule) {
-                return asList(schedule.getUri(), schedule.getState(), schedule.getCron(), schedule.getProcessId(), schedule.getExecutable());
-            }
-        });
+        return print(getGoodData().getProcessService().listSchedules(getCurrentProject()),
+                asList("URI", "State", "Cron", "Process ID", "Executables"),
+                s -> asList(s.getUri(), s.getState(), s.getCron(), s.getProcessId(), s.getExecutable()));
     }
 
     @CliCommand(value = "schedule create", help = "Create schedule")

@@ -4,15 +4,10 @@
 
 package cz.geek.gooddata.shell.commands;
 
-import static java.util.Arrays.asList;
-
-import com.gooddata.featureflag.FeatureFlag;
+import com.gooddata.GoodDataRestException;
 import com.gooddata.featureflag.FeatureFlagService;
 import com.gooddata.featureflag.ProjectFeatureFlag;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
-
-import com.gooddata.GoodDataRestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -20,7 +15,7 @@ import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import static java.util.Arrays.asList;
 
 /**
  * FeatureFlagCommand to setup feature flags
@@ -41,23 +36,15 @@ public class FeatureCommand extends AbstractGoodDataCommand {
     @CliCommand(value = "feature --project list", help = "List feature flags for project")
     public String listProject() {
         final FeatureFlagService service = getGoodData().getFeatureFlagService();
-        return print(service.listFeatureFlags(getCurrentProject()), asList("flag", "value"), new RowExtractor<FeatureFlag>() {
-            @Override
-            public List<?> extract(FeatureFlag flag) {
-                return asList(flag.getName(), flag.isEnabled());
-            }
-        });
+        return print(service.listFeatureFlags(getCurrentProject()), asList("flag", "value"),
+                flag -> asList(flag.getName(), flag.isEnabled()));
     }
 
     @CliCommand(value = "feature list", help = "List all feature flags for project")
     public String listAll() {
         final FeatureFlagService service = getGoodData().getFeatureFlagService();
-        return print(service.listFeatureFlags(getCurrentProject()), asList("flag", "value"), new RowExtractor<FeatureFlag>() {
-            @Override
-            public List<?> extract(FeatureFlag flag) {
-                return asList(flag.getName(), flag.isEnabled());
-            }
-        });
+        return print(service.listFeatureFlags(getCurrentProject()), asList("flag", "value"),
+                flag -> asList(flag.getName(), flag.isEnabled()));
     }
 
     @CliCommand(value = "feature --project set", help = "set feature flag for project")

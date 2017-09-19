@@ -10,14 +10,11 @@ import com.gooddata.auditevent.AuditEventPageRequest;
 import com.gooddata.auditevent.AuditEventService;
 import com.gooddata.collections.PageableList;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -55,11 +52,7 @@ public class AuditEventCommand extends AbstractGoodDataCommand {
             events = service.listAuditEvents(a);
         }
 
-        return print(events, asList("Occurred", "Type", "Login", "IP"), new RowExtractor<AuditEvent>() {
-            @Override
-            public List<?> extract(AuditEvent event) {
-                return asList(event.getOccurred(), event.getType(), event.getUserLogin(), event.getUserIp());
-            }
-        });
+        return print(events, asList("Occurred", "Type", "Login", "IP"),
+                event -> asList(event.getOccurred(), event.getType(), event.getUserLogin(), event.getUserIp()));
     }
 }

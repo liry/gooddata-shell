@@ -15,12 +15,7 @@ public class TableResultSetExtractor implements ResultSetExtractor<Table> {
     public Table extractData(final ResultSet rs) throws SQLException {
         final List<String> header = createHeader(rs.getMetaData());
         final List<List<String>> items = createRows(rs);
-        return new Table(header, items, new RowExtractor<List<String>>() {
-            @Override
-            public List<?> extract(final List<String> row) {
-                return row;
-            }
-        });
+        return new Table(header, items, row -> row);
     }
 
     private List<List<String>> createRows(final ResultSet rs) throws SQLException {

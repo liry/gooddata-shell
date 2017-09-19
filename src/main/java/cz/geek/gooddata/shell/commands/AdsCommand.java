@@ -13,15 +13,12 @@ import com.gooddata.warehouse.WarehouseUser;
 import com.gooddata.warehouse.WarehouseUserRole;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.components.WarehouseConnection;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import cz.geek.gooddata.shell.output.Table;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 import static cz.geek.gooddata.shell.output.TableResultSetExtractor.TABLE_RESULT_SET_EXTRACTOR;
 import static java.util.Arrays.asList;
@@ -46,12 +43,8 @@ public class AdsCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "ads list", help = "List ADS instances")
     public String list() {
-        return print(getWarehouseService().listWarehouses(), asList("JDBC URI", "Title"), new RowExtractor<Warehouse>() {
-            @Override
-            public List<?> extract(final Warehouse warehouse) {
-                return asList(warehouse.getConnectionUrl(), warehouse.getTitle());
-            }
-        });
+        return print(getWarehouseService().listWarehouses(), asList("JDBC URI", "Title"),
+                warehouse -> asList(warehouse.getConnectionUrl(), warehouse.getTitle()));
     }
 
     @CliCommand(value = "ads create", help = "Create ADS instances")
@@ -97,12 +90,7 @@ public class AdsCommand extends AbstractGoodDataCommand {
     public String users() {
         final Warehouse warehouse = getCurrentWarehouseConnection().getWarehouse();
         final PageableList<WarehouseUser> users = getWarehouseService().listWarehouseUsers(warehouse, new PageRequest());
-        return print(users, asList("Id", "Role"), new RowExtractor<WarehouseUser>() {
-            @Override
-            public List<?> extract(final WarehouseUser user) {
-                return asList(user.getUri(), user.getRole());
-            }
-        });
+        return print(users, asList("Id", "Role"), user -> asList(user.getUri(), user.getRole()));
     }
 
     @CliCommand(value = "ads useradd", help = "Add user to ADS")

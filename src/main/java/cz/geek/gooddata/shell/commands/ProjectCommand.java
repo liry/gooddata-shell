@@ -9,7 +9,6 @@ import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
 import com.gooddata.project.ProjectValidationType;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -42,12 +41,8 @@ public class ProjectCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "project list", help = "List GoodData projects")
     public String list() {
-        return print(getProjectService().getProjects(), asList("URI", "Title"), new RowExtractor<Project>() {
-            @Override
-            public List<?> extract(Project project) {
-                return asList(project.getUri(), project.getTitle());
-            }
-        });
+        return print(getProjectService().getProjects(), asList("URI", "Title"),
+                project -> asList(project.getUri(), project.getTitle()));
     }
 
     @CliCommand(value = "project create", help = "Create GoodData project")

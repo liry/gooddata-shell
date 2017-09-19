@@ -1,10 +1,10 @@
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.md.Queryable;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.report.ReportExportFormat;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -64,18 +64,14 @@ public class ReportCommand extends AbstractGoodDataCommand {
                 result.add(row);
             }
         }
-        return print(result, header, new RowExtractor<List<String>>() {
-            @Override
-            public List<?> extract(List<String> row) {
-                return row;
-            }
-        });
+        return print(result, header, row -> row);
     }
 
     @CliCommand(value = "report list", help = "List reports")
     public String list(@CliOption(key = {"definition"}, help = "List definitions",
             unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") final boolean definition) {
-        return printEntries(getGoodData().getMetadataService().find(getCurrentProject(), definition ? ReportDefinition.class : Report.class));
+        final Class<? extends Queryable> cls = definition ? ReportDefinition.class : Report.class;
+        return printEntries(getGoodData().getMetadataService().find(getCurrentProject(), cls));
     }
 
 }

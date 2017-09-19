@@ -6,7 +6,6 @@ import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.dataload.processes.ProcessService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
-import cz.geek.gooddata.shell.output.RowExtractor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -20,7 +19,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,12 +60,7 @@ public class ProcessCommand extends AbstractGoodDataCommand {
 
     private String list(final Collection<DataloadProcess> processes) {
         return print(processes, asList("URI", "Name", "Executables"),
-                new RowExtractor<DataloadProcess>() {
-            @Override
-            public List<?> extract(DataloadProcess process) {
-                return asList(process.getUri(), process.getName(), process.getExecutables());
-            }
-        });
+                process -> asList(process.getUri(), process.getName(), process.getExecutables()));
     }
 
     @CliCommand(value = "process upload", help = "Create or update process")
