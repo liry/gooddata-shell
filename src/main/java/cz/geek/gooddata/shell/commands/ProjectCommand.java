@@ -93,7 +93,7 @@ public class ProjectCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "project validate", help = "Validate GoodData project")
     public String validate(@CliOption(key = {""}, help = "Project id or uri") String project) {
-        final Project p = getProject(project);
+        final Project p = holder.hasCurrentProject() ? holder.getCurrentProject() : getProject(project);
         final ProjectValidationResults results = getProjectService().validateProject(p, ProjectValidationType.PDM_VS_DWH, ProjectValidationType.INVALID_OBJECTS, ProjectValidationType.LDM, ProjectValidationType.METRIC_FILTER).get();
         return "Valid: " + results.isValid();
     }
