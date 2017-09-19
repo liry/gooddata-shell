@@ -4,6 +4,7 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Entry;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
+import com.gooddata.md.ProjectDashboard;
 import com.gooddata.md.Queryable;
 import com.gooddata.md.Restriction;
 import com.gooddata.md.report.Report;
@@ -27,7 +28,8 @@ public class MdCommand extends AbstractGoodDataCommand {
 
     static enum MdType {
         attribute(Attribute.class), fact(Fact.class), metric(Metric.class),
-        report(Report.class), reportdefinition(ReportDefinition.class);
+        report(Report.class), reportdefinition(ReportDefinition.class),
+        dashboard(ProjectDashboard.class);
 
         private final Class<? extends Queryable> cls;
 
