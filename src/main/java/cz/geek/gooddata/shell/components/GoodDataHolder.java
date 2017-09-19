@@ -1,5 +1,6 @@
 package cz.geek.gooddata.shell.components;
 
+import com.gooddata.account.Account;
 import com.gooddata.project.Project;
 import com.gooddata.warehouse.Warehouse;
 import cz.geek.gooddata.shell.components.MyGoodData.Credentials;
@@ -14,6 +15,8 @@ public class GoodDataHolder {
     private Credentials credentials;
 
     private MyGoodData goodData;
+
+    private Account currentAccount;
 
     private WarehouseConnection connection;
 
@@ -32,12 +35,15 @@ public class GoodDataHolder {
         return goodData;
     }
 
-    public void login(final Credentials credentials) {
+    public Account login(final Credentials credentials) {
         this.credentials = credentials;
-        goodData = new MyGoodData(credentials);
+        this.goodData = new MyGoodData(credentials);
         this.shortHost = credentials.getHost() == null ? "secure" : credentials.getHost().substring(0, credentials.getHost().indexOf('.'));
         this.currentProject = null;
         this.connection = null;
+        this.currentAccount = goodData.getAccountService().getCurrent();
+
+        return currentAccount;
     }
 
     public Credentials getCredentials() {
@@ -46,6 +52,10 @@ public class GoodDataHolder {
 
     public boolean hasCredentials() {
         return credentials != null;
+    }
+
+    public Account getCurrentAccount() {
+        return currentAccount;
     }
 
     public void setCurrentProject(final Project currentProject) {

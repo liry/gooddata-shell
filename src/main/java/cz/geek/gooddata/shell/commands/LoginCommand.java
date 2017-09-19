@@ -34,8 +34,7 @@ public class LoginCommand extends AbstractGoodDataCommand {
             final ConsoleReader cr = new ConsoleReader();
             pass = cr.readLine("Password: ", '*');
         }
-        holder.login(new Credentials(host, user, pass));
-        final Account current = getGoodData().getAccountService().getCurrent();
+        final Account current = holder.login(new Credentials(host, user, pass));
         if (projectUri != null) {
             final Project project = getGoodData().getProjectService().getProjectByUri(projectUri);
             holder.setCurrentProject(project);

@@ -50,7 +50,7 @@ public class AccountCommand extends AbstractGoodDataCommand {
             @CliOption(key = {"last"}, help = "Last name") String last,
             @CliOption(key = {"ips"}, help = "IP whitelist (comma separated)") String ip
     ) throws IOException {
-        final Account a = account != null ? getAccount(account) : getAccountService().getCurrent();
+        final Account a = account != null ? getAccount(account) : holder.getCurrentAccount();
         a.setEmail(null); // todo this is a bit weird, but doesn't work otherwise
         if (first != null) {
             a.setFirstName(first);
@@ -67,7 +67,7 @@ public class AccountCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "account get", help = "Get account")
     public String project(@CliOption(key = {""}, help = "Account id or uri or current account if not given") String account) {
-        final Account a = account != null ? getAccount(account) : getAccountService().getCurrent();
+        final Account a = account != null ? getAccount(account) : holder.getCurrentAccount();
         return print(singletonList(a));
     }
 
