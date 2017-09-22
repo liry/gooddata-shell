@@ -1,5 +1,6 @@
 package cz.geek.gooddata.shell.commands;
 
+import com.gooddata.export.ExportFormat;
 import com.gooddata.md.Queryable;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
@@ -32,7 +33,7 @@ public class ReportCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"report execute", "report list"})
+    @CliAvailabilityIndicator({"report export", "report list"})
     public boolean isAvailable() {
         return holder.hasCurrentProject();
     }
@@ -46,10 +47,10 @@ public class ReportCommand extends AbstractGoodDataCommand {
 
         if (reportUri != null) {
             final Report report = getGoodData().getMetadataService().getObjByUri(reportUri, Report.class);
-            getGoodData().getReportService().exportReport(report, ReportExportFormat.CSV, output).get();
+            getGoodData().getExportService().export(report, ExportFormat.CSV, output).get();
         } else if (definitionUri != null) {
             final ReportDefinition rd = getGoodData().getMetadataService().getObjByUri(definitionUri, ReportDefinition.class);
-            getGoodData().getReportService().exportReport(rd, ReportExportFormat.CSV, output).get();
+            getGoodData().getExportService().export(rd, ExportFormat.CSV, output).get();
         } else {
             throw new IllegalArgumentException("Report or Report definition URI must be specified");
         }
