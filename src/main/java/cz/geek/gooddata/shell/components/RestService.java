@@ -1,12 +1,10 @@
 package cz.geek.gooddata.shell.components;
 
 import com.gooddata.AbstractService;
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
