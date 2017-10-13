@@ -4,6 +4,7 @@ import com.gooddata.account.Account;
 import com.gooddata.account.AccountService;
 import com.gooddata.md.Entry;
 import com.gooddata.project.Project;
+import com.gooddata.project.ProjectService;
 import cz.geek.gooddata.shell.components.GoodDataHolder;
 import cz.geek.gooddata.shell.components.MyGoodData;
 import cz.geek.gooddata.shell.output.RowExtractor;
@@ -76,4 +77,10 @@ public abstract class AbstractGoodDataCommand implements ExecutionProcessor {
         final AccountService service = getGoodData().getAccountService();
         return Account.TEMPLATE.matches(account) ? service.getAccountByUri(account) : service.getAccountById(account);
     }
+
+    protected Project getProject(final String project) {
+        final ProjectService service = getGoodData().getProjectService();
+        return Project.TEMPLATE.matches(project) ? service.getProjectByUri(project) : service.getProjectById(project);
+    }
+
 }

@@ -28,16 +28,16 @@ public class LoginCommand extends AbstractGoodDataCommand {
             @CliOption(key = {"user"}, mandatory = true, help = "User name") String user,
             @CliOption(key = {"pass"}, help = "Password") String pass,
             @CliOption(key = {"host"}, help = "Host") String host,
-            @CliOption(key = {"project"}, help = "Current project URI") String projectUri) throws IOException {
+            @CliOption(key = {"project"}, help = "Current project") String project) throws IOException {
 
         if (StringUtils.isBlank(pass)) {
             final ConsoleReader cr = new ConsoleReader();
             pass = cr.readLine("Password: ", '*');
         }
         final Account current = holder.login(new Credentials(host, user, pass));
-        if (projectUri != null) {
-            final Project project = getGoodData().getProjectService().getProjectByUri(projectUri);
-            holder.setCurrentProject(project);
+        if (project != null) {
+            final Project p = getProject(project);
+            holder.setCurrentProject(p);
         }
         return "Logged: " + current.getUri() + " " + current.getFirstName() + " " + current.getLastName();
     }

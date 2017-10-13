@@ -107,11 +107,6 @@ public class ProjectCommand extends AbstractGoodDataCommand {
         return getGoodData().getProjectService();
     }
 
-    private Project getProject(final String project) {
-        final ProjectService service = getProjectService();
-        return Project.TEMPLATE.matches(project) ? service.getProjectByUri(project) : service.getProjectById(project);
-    }
-
     private static List<String> invitationResult(final String item, final List<String> list) {
         final List<String> result = new ArrayList<>();
         if (!list.isEmpty()) {
