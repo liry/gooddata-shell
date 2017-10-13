@@ -19,7 +19,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -36,7 +39,7 @@ public class RestCommand extends AbstractGoodDataCommand {
         super(holder);
     }
 
-    @CliAvailabilityIndicator({"rest get"})
+    @CliAvailabilityIndicator({"rest get", "rest post"})
     public boolean isAvailable() {
         return holder.hasGoodData();
     }
@@ -49,22 +52,50 @@ public class RestCommand extends AbstractGoodDataCommand {
             throws IOException {
         final RestService service = getGoodData().getRestService();
 
-        if (target != null) {
-            final ResponseEntity<byte[]> response = service.get(uri, byte[].class);
+        final ResponseEntity<byte[]> response = service.get(uri, byte[].class);
+
+        return processResponse(response, target, raw);
+    }
+
+    @CliCommand(value = "rest post", help = "Perform POST request to the given URI")
+    public String post(@CliOption(key = {"uri", ""}, mandatory = true) String uri,
+                      @CliOption(key = "data") String data,
+                      @CliOption(key = "source") File source,
+                      @CliOption(key = "target") File target,
+                      @CliOption(key = "raw", help = "Raw value (don't pretty print JSON)",
+                              unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") boolean raw)
+            throws IOException {
+        final RestService service = getGoodData().getRestService();
+
+        final String request;
+        if (data != null) {
+            request = data;
+        } else if (source != null) {
+            try (final InputStream stream = Files.newInputStream(source.toPath())) {
+                request = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            }
+        } else {
+            throw new IllegalArgumentException("Data or source argument required");
+        }
+        final ResponseEntity<byte[]> response = service.post(uri, request, byte[].class);
+
+        return processResponse(response, target, raw);
+    }
+
+    private String processResponse(final ResponseEntity<byte[]> response, final @CliOption(key = "target") File target, final @CliOption(key = "raw", help = "Raw value (don't pretty print JSON)",
+            unspecifiedDefaultValue = "false", specifiedDefaultValue = "true") boolean raw) throws IOException {
+        if (response.getBody() == null) {
+            return "Status: " + response.getStatusCode();
+        } else if (target != null) {
             try (OutputStream output = new FileOutputStream(target)) {
                 final int length = IOUtils.copy(new ByteArrayInputStream(response.getBody()), output);
                 return "Status: " + response.getStatusCode() + " " + target.getAbsolutePath() + ": " + length + " bytes";
             }
-        }
-
-        final ResponseEntity<String> response = service.get(uri, String.class);
-        if (response.getBody() == null) {
-            return "Status: " + response.getStatusCode();
         } else if (!raw && isCompatible(response.getHeaders())) {
             final JsonNode tree = mapper.readTree(response.getBody());
             return mapper.writeValueAsString(tree);
         } else {
-            return response.getBody();
+            return new String(response.getBody());
         }
     }
 

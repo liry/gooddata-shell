@@ -1,6 +1,12 @@
 package cz.geek.gooddata.shell.components;
 
 import com.gooddata.AbstractService;
+import com.sun.org.apache.xpath.internal.operations.Mult;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,5 +21,14 @@ public class RestService extends AbstractService {
     public <T> ResponseEntity<T> get(final String uri, Class<T> cls) {
         notNull(uri, "uri");
         return restTemplate.getForEntity(uri, cls);
+    }
+
+    public <T> ResponseEntity<T> post(final String uri, final Object request, final Class<T> cls) {
+        notNull(uri, "uri");
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        final HttpEntity<?> entity = new HttpEntity<>(request, headers);
+        return restTemplate.exchange(uri, HttpMethod.POST, entity, cls);
     }
 }
