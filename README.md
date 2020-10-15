@@ -1,10 +1,9 @@
 # GoodData Shell
 
-[![Build Status](https://travis-ci.org/liry/gooddata-shell.png?branch=master)](https://travis-ci.org/liry/gooddata-shell)
+![CI](https://github.com/liry/gooddata-shell/workflows/CI/badge.svg?branch=master&event=push)
 
 The *GoodData Shell* is a command line client for interacting with the [GoodData Platform](http://www.gooddata.com/).
 It is built on the [GoodData Java SDK](https://github.com/gooddata/gooddata-java) and the [Spring Shell](https://docs.spring.io/spring-shell/docs/current/reference/htmlsingle/).
-
 
 ## Features
 
