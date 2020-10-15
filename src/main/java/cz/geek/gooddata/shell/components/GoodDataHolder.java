@@ -38,7 +38,7 @@ public class GoodDataHolder {
     public Account login(final Credentials credentials) {
         this.credentials = credentials;
         this.goodData = new MyGoodData(credentials);
-        this.shortHost = credentials.getHost() == null ? "secure" : credentials.getHost().substring(0, credentials.getHost().indexOf('.'));
+        this.shortHost = credentials.getHost() == null ? "secure" : extractShortHost(credentials);
         this.currentProject = null;
         this.connection = null;
         this.currentAccount = goodData.getAccountService().getCurrent();
@@ -113,5 +113,13 @@ public class GoodDataHolder {
 
     public boolean isPrintStackTrace() {
         return printStackTrace;
+    }
+
+    private String extractShortHost(final Credentials credentials) {
+        if (credentials.getHost().indexOf('.') == -1) {
+            return credentials.getHost();
+        } else {
+            return credentials.getHost().substring(0, credentials.getHost().indexOf('.'));
+        }
     }
 }
