@@ -12,7 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
+ *
  */
 @Component
 public class MaqlCommand extends AbstractGoodDataCommand {
@@ -30,16 +34,24 @@ public class MaqlCommand extends AbstractGoodDataCommand {
 
     @CliCommand(value = "maql", help = "Execute MAQL DDL")
     public String maql(@CliOption(key = {"maql", ""}, help = "MAQL DDL") String maql,
-                       @CliOption(key = "file", help = "MAQL DDL file") File file) throws IOException {
+                       @CliOption(key = "file", help = "MAQL DDL file (executes each row separately)") File file) {
         if (file != null) {
-            final List<String> maqls = FileUtils.readLines(file);
-            getGoodData().getModelService().updateProjectModel(getCurrentProject(), maqls).get();
-        } else if (maql != null) {
+            try {
+                final List<String> maqls = FileUtils.readLines(file, UTF_8);
+                if (maqls.size() > 0) {
+                    getGoodData().getModelService().updateProjectModel(getCurrentProject(), maqls).get();
+                } else {
+                    throw new IllegalArgumentException("maql file cannot be empty");
+                }
+            } catch (IOException e) {
+                throw new IllegalArgumentException(format("file %s doesn't exist", file.getAbsolutePath()));
+            }
+        } else if (maql != null && maql.length() > 0) {
             getGoodData().getModelService().updateProjectModel(getCurrentProject(), maql).get();
         } else {
             throw new IllegalArgumentException("maql or file argument has to be specified");
         }
-        return "Executed";
+        return "MAQL Executed";
     }
 
 }
