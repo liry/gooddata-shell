@@ -5,6 +5,8 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.shell.Bootstrap;
 import org.springframework.shell.core.JLineShellComponent;
@@ -13,6 +15,7 @@ import org.springframework.shell.core.JLineShellComponent;
  * Parent instantiating the shell inside a test case, so we can execute the command and then perform assertions
  * on the return value CommandResult.
  */
+@RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractShellIntegrationTest {
 
     private static JLineShellComponent shell;
